@@ -1,3 +1,13 @@
+html {
+    overflow: hidden;
+}
+
+.window-space {
+    width: 100%;
+    position: absolute;
+    top: 31px;
+}
+
 .window {
     height: 500px;
     width: 500px;
@@ -8,7 +18,35 @@
 
 .window-test-topbar {
     height: 50px;
-    width: 500px;
+    width: 100%;
     border-radius: 10px 10px 0 0;
     background-color: grey;
+}
+
+@keyframes openFullscreen {
+    66% {
+        height: 100%;
+        width: 100%;
+    }
+    100% {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.open-fullscreen {
+    animation: openFullscreen .3s;
+}
+
+.fullscreen {
+    height: 100%;
+    width: 100%;
+}
+
+@keyframes closeFullscreen {}
+
+.close-fullscreen {
+    height: 100%;
+    width: 100%;
+    animation: claseFullscreen .3s;
 }

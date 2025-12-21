@@ -18,6 +18,13 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
         setToFirstPlan(windowElement);
 
+        if (e.button === 2) {
+            if (windowElement.classList[1] === 'fullscreen') {removeFullscreen(windowElement); return}
+        
+            fullScreen(windowElement);
+            return // edit for special action
+        }
+
         if (!isDraggableChild(e.target)) return;
 
         mouseX = e.clientX;
@@ -42,20 +49,9 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
         // Prevent overflow
 
-        if (newLeft < 0) {
-            // left
-            newLeft = 0;
-        } else if (newLeft + windowElement.clientWidth >= window.innerWidth) {
-            // right
-            newLeft = window.innerWidth - windowElement.clientWidth - 2;
-        }
-
-        if (newTop <= 31) {
+        if (newTop <= 0) {
             // top
-            newTop = 32;
-        } else if (newTop + windowElement.clientHeight >= window.innerHeight) {
-            // bottom
-            newTop = window.innerHeight - windowElement.clientHeight - 2;
+            newTop = 1;
         }
 
         windowElement.style.left = 100 * newLeft / window.innerWidth + '%';
@@ -88,8 +84,18 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
     });
 }
 
+function removeFullscreen(windowElement) {
+    windowElement.classList.replace('fullscreen', 'close-fullscreen');
+    setTimeout(() => {
+        windowElement.classList.remove('close-fullscreen');
+    }, 200);
+}
+
 function fullScreen(windowElement) {
-    // enter fullscreen
+    windowElement.classList.add('open-fullscreen');
+    setTimeout(() => {
+        windowElement.classList.replace('open-fullscreen', 'fullscreen');
+    }, 200);
 }
 
 function setToFirstPlan(currentWindow) {
@@ -141,7 +147,8 @@ function onStart() {
     document.getElementById('option-2').addEventListener('click', () => {
         let window = document.createElement('div');
         window.innerHTML = "<div id='window-test' class='window' style='position: absolute; top: 20%; left: 20%; z-index: 1'><div class='window-test-topbar draggable'></div></div>"
-        document.body.appendChild(window);
+        let windowSpace = document.getElementById('window-space');
+        windowSpace.appendChild(window);
         createWindow(document.getElementById('window-test'));
     });
 }

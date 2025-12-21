@@ -6,7 +6,7 @@ function addOpenMenuEvent() {
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
 
-        if (e.target !== document.getElementById('background') && e.target !== document.getElementById('selection')) return;
+        if (e.target !== document.getElementById('selection') && e.target !== document.getElementById('window-space')) return;
 
         customMenu.classList.remove('disappear');
         customMenu.style.display = 'block';
@@ -45,9 +45,11 @@ function addSelectionDivInteration() {
     const selectionDiv = document.getElementById('selection');
     let startX, startY;
 
-    document.addEventListener('mousedown', function(e) {
+    let windowSpace = document.getElementById('window-space');
 
-        if (e.target !== document.getElementById('background')) return;
+    windowSpace.addEventListener('mousedown', function(e) {
+
+        if (e.target !== windowSpace || e.button === 2) return;
 
         startX = e.clientX;
         startY = e.clientY;
@@ -62,6 +64,7 @@ function addSelectionDivInteration() {
     });
 
     document.addEventListener('mouseup', function() {
+        console.log('Mouse UP');
         document.removeEventListener('mousemove', onMouseMove);
         selectionDiv.style.display = 'none';
     });
@@ -263,6 +266,14 @@ function addTopRightElements() {
     document.getElementById('top-right').appendChild(elements);
 }
 
+function addWindowSpace() {
+    let windowSpace = document.createElement('div');
+    windowSpace.id = 'window-space';
+    windowSpace.classList.add('window-space');
+    windowSpace.style.height = `${window.innerHeight - 31}px`;
+    document.body.append(windowSpace);  
+}
+
 function addStyle() {
     const mainStyle = document.createElement('link');
     mainStyle.rel = 'stylesheet';
@@ -275,7 +286,11 @@ function onStart() {
     createBackgroundDiv();
     createSelectionDiv();
     createTopBarDiv();
+    addWindowSpace();
     createMenuDiv();
+
+    loadApp('notification-manager');
+    loadApp('window-manager');
 
     addTopRightElements();
     
@@ -286,8 +301,6 @@ function onStart() {
     addCloseMenuEvent();
     addSelectionDivInteration();
 
-    loadApp('notification-manager');
-    loadApp('window-manager');
     // loadApp('browser-compatibility');
 
     document.getElementById('script-home-view').outerHTML = '';
