@@ -162,6 +162,62 @@ function addTimeDiv() {
     element.appendChild(timeDiv);
 }
 
+function addUpdateElementsTopRight() {
+
+    // Battery
+
+    if (localStorage.getItem('batteryUpdate')) {
+        setInterval(async function () {
+            let batteryData = await navigator.getBattery();
+            let icons = {
+                0 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M440-400h80v-240h-80v240Zm40 160q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240ZM320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-80h240v-560H360v560Zm0 0h240-240Z"/></svg>',
+                1 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-240h240v-400H360v400Z"/></svg>',
+                2 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-400h240v-240H360v240Z"/></svg>',
+                3 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-560h240v-80H360v80Z"/></svg>',
+                4 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Z"/></svg>'
+            };  
+            let charging = '<svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#e3e3e3"><g transform="scale(0.7)"><path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Zm151-390Z"/></g></svg>';
+
+            let batteryElement = document.getElementById('battery');
+
+            batteryElement.innerHTML = '';
+
+            /* console.log(batteryElement.firstChild);
+            console.log(batteryElement);
+            batteryElement.removeChild(batteryElement.firstChild); */
+
+            if (batteryData.charging)  {
+                let icon = document.createElement('svg');
+                icon.innerHTML = charging;  
+                icon.style.width = "10px";
+                batteryElement.appendChild(icon);
+            }
+
+            if (batteryData.level < 0.1) {
+                let icon = document.createElement('svg');
+                icon.innerHTML = icons[0];
+                batteryElement.appendChild(icon);
+            } else if (batteryData.level < 0.2) {
+                let icon = document.createElement('svg');
+                icon.innerHTML = icons[1];
+                batteryElement.appendChild(icon);
+            } else if (batteryData.level < 0.5) {
+                let icon = document.createElement('svg');
+                icon.innerHTML = icons[2];
+                batteryElement.appendChild(icon);
+            } else if (batteryData.level < 0.8) {
+                let icon = document.createElement('svg');
+                icon.innerHTML = icons[3];
+                batteryElement.appendChild(icon);
+            } else {
+                let icon = document.createElement('svg');
+                icon.innerHTML = icons[4];
+                batteryElement.appendChild(icon);
+            }
+        }, 3000)
+    }
+}
+
 function addTopRightElements() {
     let elements = document.createElement('div');
     elements.classList.add('item');
@@ -201,6 +257,8 @@ function addTopRightElements() {
 
     elements.appendChild(soundElement);
     elements.appendChild(batteryElement);
+
+    addUpdateElementsTopRight();
 
     document.getElementById('top-right').appendChild(elements);
 }
