@@ -1,0 +1,173 @@
+/* Fonts */
+
+@font-face {
+    font-family: "Ubuntu Sans";
+    src: url("../../../home/usr/.fonts/Main.ttf");
+}
+
+/* Main */
+
+html {
+    height: 100%;
+    width: 100%;
+}
+
+body  {
+    height: 100%;
+    width: 100%;
+    font-family: "Ubuntu Sans";
+    font-size: 14px;
+    background-size: 100%;
+    margin: 0px;
+    user-select: none;
+}
+
+/* Bakcground */
+
+.background {
+    position: absolute;
+    background-image: url('../../../home/usr/.backgrounds/bg-1.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Selection */
+
+.selection {
+    z-index: 1;
+
+    position: absolute;
+    border: solid;
+    border-width: 1px;
+    background-color: rgba(255, 76, 0, 0.5);
+    border-color: rgb(255, 76, 0);
+}
+
+/* Custom Menu */
+
+@keyframes customMenuAppear {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.custom-menu {
+    display: none;
+    position: absolute;
+    border: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: #333333;
+
+    background-color:#1b1b1b;
+    
+    box-shadow: 0 0 7px #1b1b1b;
+
+    z-index: 999;
+    padding: 3px;
+    min-width: 150px;
+
+    animation: customMenuAppear .066s;
+}
+
+@keyframes customMenuDisappear {
+    0% {opacity: 1}
+    66.66% {opacity: 0}
+    100% {opacity: 0}
+}
+
+.custom-menu.disappear {
+    animation: customMenuDisappear .10s;
+}
+
+.custom-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.custom-menu hr {
+    width: 90%;
+    border-top-width: 1px;
+    color: #333;
+    overflow: visible;
+    text-align: center;
+    height: 0;
+}
+
+.custom-menu a {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 7px;
+    background-color: #1b1b1b;
+    color: white;
+    text-decoration: none;
+    display: block;
+    transition: background-color .1s;
+}
+
+.custom-menu a:hover {
+    background-color: rgba(128, 128, 128, 0.4);
+}
+
+/* Top Bar */
+
+.topbar {
+    position: absolute;
+    top: 0px;
+    z-index: 999;
+
+    display: flex;
+    flex-direction: row; 
+
+    height: 31px;
+    width: 100%;
+    margin-top: 0px;
+    background-color: rgb(19, 19, 19);
+    opacity: 1;
+}
+
+.top-left, .top-mid, .top-right {
+    width: 33.3333%;
+    display: flex;
+    flex-direction: row; 
+}
+
+.top-right {
+    justify-content: right;
+}
+
+.item {
+    margin: 2px;
+
+    display: flex;
+    align-items: center;
+
+    width: fit-content;
+    max-width: 20%;
+
+    border-radius: 50vh;
+    padding: 5px 13px;
+    color : white;
+
+    text-align: center;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+}
+
+.item:hover {
+    background-color: rgba(128, 128, 128, 0.4);
+}
+
+.icon {
+    margin: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time {
+    margin: auto;
+}

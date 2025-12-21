@@ -1,0 +1,98 @@
+.system-notification-block {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+}
+
+.system-notification-block.inactive {
+    pointer-events: none;
+    display: none;
+}
+
+.system-notification-block.active {
+    pointer-events: all;
+    display: block
+}
+
+@keyframes appearAnimation {
+  from {transform:scaleY(0);}
+  to {transform:scaleY(1);}
+}
+
+.main-notification-div {
+    color: white;
+    align-content: stretch;
+    display: grid;
+    grid-template-columns: 1fr;
+    height: 18%;
+    width: 20%;
+    background-color: #626262;
+    border-radius: 20px;
+    border: none;
+    position: fixed;
+    left: 40%;
+    top: 40%;
+    z-index: 2001;
+    animation-name: appearAnimation;
+    animation-duration: .1s;
+}
+
+@keyframes removeAnimation {
+    from {transform: scaleY(1);}
+    to {transform: scaleY(0);}
+}
+
+.main-notification-div.remove {
+    animation-name: removeAnimation;
+    animation-duration: .1s;
+}
+
+.main-notification-div h1 {
+    margin: 10px 10px 5px;
+    align-content: center;
+    text-align: center;
+    grid-column: span 2;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.main-notification-div p {
+    margin: 5px 15px;
+    text-align: center;
+    grid-column: span 2;
+}
+
+.notification-choices {
+    margin: 10px 10px;
+    align-content: stretch;
+    display: grid;
+}
+
+.notification-div-choice {
+    text-align: center;
+    margin: 10px;
+    background-color: #707070;
+    min-height : 40px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background-color .2s;
+}
+
+.notification-div-choice:hover {
+    background-color: #757575;
+}
+
+.notification-div-choice.red {
+    margin: 10pxx;
+    color: rgba(255, 143, 139);
+    background-color: rgb(131, 84, 84);
+}
+
+.notification-div-choice.red:hover {
+    background-color: rgb(133, 90, 90);
+}

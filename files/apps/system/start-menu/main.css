@@ -1,0 +1,63 @@
+@font-face {
+    font-family: 'GRUB Font';
+    src: url('../../../home/usr/.fonts/GRUB.otf');
+}
+
+html {
+    background-color: black;
+    height: 100%;
+    font-family: 'GRUB Font';
+    color: white;
+    user-select: none;
+}
+
+body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.load-screen {
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    position: fixed;
+    pointer-events: none;
+    top : 0;
+    left: 0;
+    z-index: 9999;
+}
+
+.load-screen.remove {
+    transition: opacity .1s;
+    opacity : 0;
+}
+
+.grub-box {
+    height: 90%;
+    width: 90%;
+
+    border: solid;
+    border-color: white;
+    border-width: 3px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grub-choice {
+    width: 95%;
+    padding: 1px;
+    margin: 7px;
+}
+
+.grub-choice.selected {
+    background-color: rgb(205, 205, 205);
+    color: black;
+}
+
+.grub-choice span {
+    color: black;
+}
