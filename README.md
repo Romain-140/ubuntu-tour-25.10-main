@@ -8,9 +8,13 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 * Custom apps
 
 ## TODO
+* [ ] Finis window manager
 * [ ] Finish browser compatibility module
 * [ ] Add OS tools (network, battery, sound, notification, luminosity)
 * [ ] Add settings app
+* [ ] Clean up
+* [ ] Clean up (again)
+* [ ] Clean up (last time I swear)
 
 ## Info
 Created for Firefox (possible compatibility issues with others browsers)\

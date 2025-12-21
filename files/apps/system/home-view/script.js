@@ -1,5 +1,3 @@
-var updateBattery;
-
 function addOpenMenuEvent() {
     const customMenu = document.getElementById('custom-menu');
 
