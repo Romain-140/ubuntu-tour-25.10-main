@@ -20,9 +20,10 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
         if (e.button === 2) {
             if (windowElement.classList[1] === 'fullscreen') {removeFullscreen(windowElement); return}
-        
+
             fullScreen(windowElement);
-            return // edit for special action
+
+            return
         }
 
         if (!isDraggableChild(e.target)) return;
@@ -50,12 +51,11 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         // Prevent overflow
 
         if (newTop <= 0) {
-            // top
             newTop = 1;
         }
 
         windowElement.style.left = 100 * newLeft / window.innerWidth + '%';
-        windowElement.style.top = 100 * newTop / window.innerHeight + '%';
+        windowElement.style.top = 100 * newTop / (window.innerHeight - 31) + '%';
     }
 
     function stopDragging() {
@@ -85,17 +85,13 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 }
 
 function removeFullscreen(windowElement) {
-    windowElement.classList.replace('fullscreen', 'close-fullscreen');
-    setTimeout(() => {
-        windowElement.classList.remove('close-fullscreen');
-    }, 200);
+    windowElement.classList.remove('fullscreen');
+    setTimeout(() => {windowElement.style.transition = ''}, 300);
 }
 
 function fullScreen(windowElement) {
-    windowElement.classList.add('open-fullscreen');
-    setTimeout(() => {
-        windowElement.classList.replace('open-fullscreen', 'fullscreen');
-    }, 200);
+    windowElement.style.transition = 'all .25s';
+    windowElement.classList.add('fullscreen');
 }
 
 function setToFirstPlan(currentWindow) {

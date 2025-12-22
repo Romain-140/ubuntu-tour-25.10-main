@@ -269,6 +269,7 @@ function addWindowSpace() {
     windowSpace.id = 'window-space';
     windowSpace.classList.add('window-space');
     windowSpace.style.height = `${window.innerHeight - 31}px`;
+    setInterval(() => {windowSpace.style.height = `${window.innerHeight - 31}px`}, 100);
     document.body.append(windowSpace);  
 }
 
