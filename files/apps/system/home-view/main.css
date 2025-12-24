@@ -162,12 +162,49 @@ body  {
 }
 
 .icon {
-    margin: 0 2px;
+    margin: 0 5px;
     display: flex;
-    /*justify-content: space-between;*/
     align-items: center;
 }
 
 .time {
     margin: auto;
+}
+
+@keyframes openTopBarMenu {
+    0% {top: 20px; scale: 0.95; opacity: 0}
+    100% {top: 40px; scale: 1; opacity: 1}
+}
+
+@keyframes removeTopBarMenu {
+    0% {top: 40px; scale: 1; opacity: 1}
+    100% {top: 20px; scale: 0.95; opacity: 0}
+}
+
+.time-menu {
+    height: 51.5%;
+    width: 38.49%;
+    top: 40px;
+}
+
+.menu {
+    position: absolute;
+
+    border: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: #333333;
+
+    background-color:#1b1b1b;
+    
+    box-shadow: 0 0 15px black;
+
+    z-index: 999;
+    padding: 7px;
+
+    animation: openTopBarMenu .15s;
+}
+
+.menu.remove {
+    animation: removeTopBarMenu .15s;
 }

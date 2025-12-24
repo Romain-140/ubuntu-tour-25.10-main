@@ -62,7 +62,6 @@ function addSelectionDivInteration() {
     });
 
     document.addEventListener('mouseup', function() {
-        console.log('Mouse UP');
         document.removeEventListener('mousemove', onMouseMove);
         selectionDiv.style.display = 'none';
     });
@@ -158,12 +157,44 @@ function addTimeDiv() {
     timeDiv.id = 'time';
     timeDiv.textContent = updateTime();
     
-    setInterval(() => {timeDiv.textContent = updateTime();}, 1000);
-    // TODO later: add top bar menues
+    setInterval(() => {timeDiv.textContent = updateTime()}, 1000);
+    
     element.appendChild(timeDiv);
 }
 
 function addUpdateElementsTopRight() {
+
+    // Network
+
+    if (localStorage.getItem('networkUpdate')) {
+        setInterval(() => {
+            let connectionType = navigator.connection.effectiveType;
+            let quality = 0;
+
+            let icons = {
+                0 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q95-97 219.5-148.5T480-800q136 0 260.5 51.5T960-600L480-120Zm0-114 364-364q-79-60-172-91t-192-31q-99 0-192 31t-172 91l364 364Z"/></svg>',
+                1 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q96-98 220-149t260-51q137 0 261 51t219 149L480-120ZM361-353q25-18 55.5-28t63.5-10q33 0 63.5 10t55.5 28l245-245q-78-59-170.5-90.5T480-720q-101 0-193.5 31.5T116-598l245 245Z"/></svg>',
+                2 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q96-98 220-149t260-51q137 0 261 51t219 149L480-120ZM232-482q53-38 116-59.5T480-563q69 0 132 21.5T728-482l116-116q-78-59-170.5-90.5T480-720q-101 0-193.5 31.5T116-598l116 116Z"/></svg>',
+                3 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q95-97 219.5-148.5T480-800q136 0 260.5 51.5T960-600L480-120Z"/></svg>'
+            };
+
+            if (connectionType === '4g') {
+                quality = 3;
+            } else if (connectionType === '3g') {
+                quality = 2;
+            } else if (connectionType === '2g') {
+                quality = 1;
+            }
+
+            let netowrkElement = document.getElementById('network');
+            netowrkElement.innerHTML = '';
+
+            let icon = document.createElement('svg');
+            icon.innerHTML = icons[quality];
+            netowrkElement.appendChild(icon);
+
+        }, 3000);
+    }
 
     // Battery
 
@@ -182,10 +213,6 @@ function addUpdateElementsTopRight() {
             let batteryElement = document.getElementById('battery');
 
             batteryElement.innerHTML = '';
-
-            /* console.log(batteryElement.firstChild);
-            console.log(batteryElement);
-            batteryElement.removeChild(batteryElement.firstChild); */
 
             if (batteryData.charging)  {
                 let icon = document.createElement('svg');
@@ -224,11 +251,21 @@ function addTopRightElements() {
     elements.classList.add('item');
     elements.classList.add('top-bar-right');
 
+    localStorage.removeItem('networkUpdate');
+    localStorage.removeItem('batteryUpdate');
+
     // Network
 
-    // // // // // // // // // TODO
+    let networkElement = document.createElement('div');
+    networkElement.id = 'network';
+    networkElement.classList.add('network-display');
+    networkElement.classList.add('icon');
 
-    if (navigator.userAgentData) localStorage.setItem('networkUpdate', true);
+    let networkIcon = document.createElement('div');
+    networkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q95-97 219.5-148.5T480-800q136 0 260.5 51.5T960-600l-40 40q-28-36-69.5-58T760-640q-83 0-141.5 58.5T560-440q0 49 22 90.5t58 69.5L480-120Zm280-40q-17 0-29.5-12.5T718-202q0-17 12.5-29.5T760-244q17 0 29.5 12.5T802-202q0 17-12.5 29.5T760-160Zm-30-128q0-38 10-59t43-54q21-21 27-31.5t6-26.5q0-18-14-31.5T765-504q-21 0-39 13.5T700-454l-54-22q12-38 44-61t75-23q49 0 80 29t31 74q0 23-10 41t-38 46q-24 24-30 38.5t-6 43.5h-62Z"/></svg>';
+    networkElement.appendChild(networkIcon);
+
+    if (navigator.connection) localStorage.setItem('networkUpdate', true);
 
     // Sound
 
@@ -254,14 +291,45 @@ function addTopRightElements() {
 
     if (navigator.userAgentData) localStorage.setItem('batteryUpdate', true);
 
-    // TODO: add battery change (intervale 3000 if updateBattery)
+    // // //
 
+    elements.appendChild(networkElement);
     elements.appendChild(soundElement);
     elements.appendChild(batteryElement);
 
     addUpdateElementsTopRight();
 
     document.getElementById('top-right').appendChild(elements);
+}
+
+function addTopBarMenues() {
+
+    // Time
+
+    let timeDiv = document.getElementById('time');
+
+    function addTimeMenu(e) {
+        e.stopPropagation();
+
+        function removeMenu() {
+            document.getElementsByClassName('time-menu')[0].classList.add('remove');
+            setTimeout(function () {document.getElementsByClassName('time-menu')[0].outerHTML = ''}, 100);
+            document.removeEventListener('mousedown', removeMenu)
+        }
+
+        if (document.getElementsByClassName('time-menu').length > 0) return;
+        else {
+            let menuDiv = document.createElement('div');
+            menuDiv.classList.add('time-menu');
+            menuDiv.classList.add('menu');
+            // // // TODO: add notification container here & calendar
+            document.body.appendChild(menuDiv);
+
+            document.addEventListener('mousedown', removeMenu);
+        }
+    }
+
+    timeDiv.addEventListener('mousedown', addTimeMenu);
 }
 
 function addWindowSpace() {
@@ -282,22 +350,26 @@ function addStyle() {
 
 function onStart() {
 
+    // Home Menu
+    createMenuDiv();
     createBackgroundDiv();
     createSelectionDiv();
-    createTopBarDiv();
-    addWindowSpace();
-    createMenuDiv();
+    addOpenMenuEvent();
+    addCloseMenuEvent();
 
+    // To Bar
+    createTopBarDiv();
+    addTopRightElements();
+    addTimeDiv();
+    addTopBarMenues();
+    addStyle();
+
+    // Windows
+    addWindowSpace();
     loadApp('notification-manager');
     loadApp('window-manager');
 
-    addTopRightElements();
-    
-    addTimeDiv();
-    addStyle();
-    
-    addOpenMenuEvent();
-    addCloseMenuEvent();
+    // Load after
     addSelectionDivInteration();
 
     // loadApp('browser-compatibility');

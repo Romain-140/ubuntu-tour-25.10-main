@@ -27,6 +27,7 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         }
 
         if (!isDraggableChild(e.target)) return;
+        if (windowElement.classList.contains('fullscreen')) return;
 
         mouseX = e.clientX;
         mouseY = e.clientY;
