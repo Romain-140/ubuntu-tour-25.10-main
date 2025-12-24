@@ -311,9 +311,11 @@ function addTopBarMenues() {
     function addTimeMenu(e) {
         e.stopPropagation();
 
-        function removeMenu() {
-            document.getElementsByClassName('time-menu')[0].classList.add('remove');
-            setTimeout(function () {document.getElementsByClassName('time-menu')[0].outerHTML = ''}, 100);
+        function removeMenu(event) {
+            let menuDiv = document.getElementsByClassName('time-menu')[0];
+            if (menuDiv.contains(event.target)) return;
+            menuDiv.classList.add('remove');
+            setTimeout(function () {menuDiv.outerHTML = ''}, 100);
             document.removeEventListener('mousedown', removeMenu)
         }
 
@@ -322,6 +324,7 @@ function addTopBarMenues() {
             let menuDiv = document.createElement('div');
             menuDiv.classList.add('time-menu');
             menuDiv.classList.add('menu');
+            // menuDiv.innerHTML = "<div id='notifications-space' class='notifications-space' style='height: 100%'></div>";
             // // // TODO: add notification container here & calendar
             document.body.appendChild(menuDiv);
 
@@ -336,11 +339,13 @@ function addTopBarMenues() {
     let rightDiv = document.getElementsByClassName('top-bar-right')[0];
 
     function addTopRightMenu(e) {
-        e.stopPropagation() // TODO: fix (try with both open)
+        e.stopPropagation()
 
-        function removeMenu() {
-            document.getElementsByClassName('top-right-menu')[0].classList.add('remove');
-            setTimeout(function () {document.getElementsByClassName('top-right-menu')[0].outerHTML = ''}, 100);
+        function removeMenu(event) {
+            let menuDiv = document.getElementsByClassName('top-right-menu')[0];
+            if (menuDiv.contains(event.target)) return;
+            menuDiv.classList.add('remove');
+            setTimeout(function () {menuDiv.outerHTML = ''}, 100);
             document.removeEventListener('mousedown', removeMenu);
         }
 
