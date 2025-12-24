@@ -330,6 +330,34 @@ function addTopBarMenues() {
     }
 
     timeDiv.addEventListener('mousedown', addTimeMenu);
+
+    // Top Right
+
+    let rightDiv = document.getElementsByClassName('top-bar-right')[0];
+
+    function addTopRightMenu(e) {
+        e.stopPropagation() // TODO: fix (try with both open)
+
+        function removeMenu() {
+            document.getElementsByClassName('top-right-menu')[0].classList.add('remove');
+            setTimeout(function () {document.getElementsByClassName('top-right-menu')[0].outerHTML = ''}, 100);
+            document.removeEventListener('mousedown', removeMenu);
+        }
+
+        if (document.getElementsByClassName('top-right-menu').length > 0) return;
+        else {
+            let menuDiv = document.createElement('div');
+            menuDiv.classList.add('top-right-menu');
+            menuDiv.classList.add('menu');
+            // // // TODO: add light, battery, [screenshot, lock, settings, turn off], parametters
+            document.body.appendChild(menuDiv);
+
+            document.addEventListener('mousedown', removeMenu);
+        }
+    }
+
+    rightDiv.addEventListener('mousedown', addTopRightMenu);
+
 }
 
 function addWindowSpace() {

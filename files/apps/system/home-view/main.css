@@ -187,6 +187,13 @@ body  {
     top: 40px;
 }
 
+.top-right-menu {
+    height: 50%;
+    width: 20%;
+    top: 40px;
+    right: 8px;
+}
+
 .menu {
     position: absolute;
 
