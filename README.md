@@ -8,7 +8,7 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 * Custom apps
 
 ## TODO
-* [ ] Finis window manager
+* [x] Finish window manager
 * [ ] Finish browser compatibility module
 * [ ] Add OS tools (network, battery, sound, notification, luminosity)
 * [ ] Add settings app
