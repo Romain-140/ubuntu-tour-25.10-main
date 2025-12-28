@@ -405,7 +405,7 @@ function onStart() {
     // Load after
     addSelectionDivInteration();
 
-    // loadApp('browser-compatibility');
+    loadApp('browser-compatibility');
 
     document.getElementById('script-home-view').outerHTML = '';
 }

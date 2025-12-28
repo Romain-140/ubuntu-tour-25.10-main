@@ -82,7 +82,6 @@ async function detectPlatform() {
     }
     
     if (data && data.brands) {
-        // Parse User Agent Client Hints brands
         for (let brand of data.brands) {
             if (!brand.brand.includes("Chromium") && 
                 !brand.brand.includes("Not") && 
@@ -104,7 +103,7 @@ async function detectPlatform() {
         browser = 'Opera';
     }
     else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
-        browser = 'Safari'; // Safari must be checked AFTER Chrome check
+        browser = 'Safari';
     }
     else if (userAgent.includes('Chrome')) {
         browser = 'Chrome';
@@ -135,7 +134,6 @@ async function detectPlatform() {
     sessionStorage.setItem('country', country || 'Unknown');
 }
 
-// More complete timezone to country mapping
 function getCountryFromTimezone(timezone) {
     const countries = {
         // North America
@@ -232,12 +230,49 @@ function getCountryFromTimezone(timezone) {
 }
 
 async function onStart() {
-    const detectionResult = await detectPlatform();
+    await detectPlatform();
+
+    let browser = sessionStorage.getItem('browser');
+    let os = sessionStorage.getItem('OS');
+
+    sessionStorage.setItem('notification-choice', '');
+
+    if (browser === 'Firefox') {
+        callSystemNotification(
+            'Important',
+            'You are currently using Firefox, which has limited browser-system interaction API.<br/>This means some feature will not be available (battery, connection, ...).',
+            ['OK']
+        );
+        await waitForChange("notification-choice");
+    }
+
+    if (os.includes('Windows')) {
+        sessionStorage.setItem('notification-choice', '');
+        callSystemNotification(
+            'Welcome!',
+            'Welcome to Ubuntu, dear Windows user!',
+            ['Hi!']
+        );
+        await waitForChange("notification-choice");
+    }
+
+    if (sessionStorage.getItem('platform') === 'Mobile') {
+        sessionStorage.setItem('notification-choice', '');
+        callSystemNotification(
+            'Warning',
+            "You're playing a dangerous game.<br/>This project was not made for mobile, so be careful.",
+            ['OK']
+        );
+        await waitForChange("notification-choice");
+    }
+
+    callSystemNotification(
+        'Information',
+        "Welcome to this online Ubuntu 25.10!<br/>As this is only a web version, some (most) features aren't available (yet).<br/>If you discover any bug, please report it on my GitHub page.<br/>Thank you!",
+        ['OK']
+    )
     
-    // Log results for debugging
-    console.log("Detection Results:", detectionResult);
-    
-    // Clean up script element if it exists
+
     const scriptEl = document.getElementById('script-browser-compatibility');
 
     if (scriptEl) scriptEl.remove();

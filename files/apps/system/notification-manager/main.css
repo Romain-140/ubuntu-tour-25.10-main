@@ -26,7 +26,7 @@
     align-content: stretch;
     display: grid;
     grid-template-columns: 1fr;
-    height: 18%;
+    min-height: 18%;
     width: 20%;
     background-color: #626262;
     border-radius: 20px;

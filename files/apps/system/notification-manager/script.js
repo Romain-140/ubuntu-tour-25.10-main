@@ -71,6 +71,12 @@ function addNotificationChoice(settings) { // boxes, red, title, text, choice1, 
     }
 }
 
+async function waitForChange(item) {
+    while (sessionStorage.getItem(item) === '') {
+        await new Promise(r => setTimeout(r, 100));
+    }
+}
+
 function testStorage(key, previousValue, id) {
     if (sessionStorage.getItem(key) !== previousValue) {
         clearInterval(id);
