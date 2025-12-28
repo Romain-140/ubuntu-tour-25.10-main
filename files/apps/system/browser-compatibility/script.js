@@ -1,32 +1,3 @@
-// ========================================
-// CRITICAL ISSUES FOUND
-// ========================================
-
-// 1. MOBILE/DESKTOP DETECTION - MAJOR FLAW
-// Current logic has several problems:
-// - Screen orientation (height/width ratio) is NOT reliable for device type
-// - Tablets in landscape mode would be detected as desktop
-// - Large phones in landscape fail detection
-// - "Mobile" in UA isn't always present on mobile devices
-
-// 2. FAKE MOBILE/DESKTOP LOGIC - BROKEN
-// - fakeMobile condition makes no sense (always true when ratio < 1)
-// - fakeDesktop logic is backwards
-// - These values are calculated but never stored
-
-// 3. BROWSER DETECTION - UNRELIABLE
-// - Safari check uses lowercase 'safari' (should be 'Safari')
-// - Assumes everything else is Chrome (not true)
-// - fakeBrowser flag doesn't help
-
-// 4. COUNTRY DETECTION - INCOMPLETE
-// - Only ~50 timezones mapped (there are 400+)
-// - Many users will get undefined country
-
-// ========================================
-// IMPROVED VERSION
-// ========================================
-
 async function detectOS() {
     let os = null;
     let userAgent = navigator.userAgent;
@@ -59,7 +30,7 @@ async function detectOS() {
                 else if (majorVersion >= 1) os = "Windows 10";
             }
         } catch (e) {
-            console.warn("High entropy values unavailable:", e);
+            throw(e);
         }
     }
 
@@ -79,11 +50,7 @@ async function detectPlatform() {
     let os = await detectOS();
     let platform = 'Desktop';
     let browser = 'Unknown';
-    let confidence = 'high'; // Track detection confidence
-
-    /* ==========================================
-       IMPROVED MOBILE/DESKTOP DETECTION
-       ========================================== */
+    let confidence = 'high';
     
     // Method 1: Check if mobile OS
     const mobileOS = ['iOS', 'iPadOS', 'Android'].includes(os);
@@ -113,10 +80,6 @@ async function detectPlatform() {
     } else {
         platform = 'Desktop';
     }
-
-    /* ==========================================
-       IMPROVED BROWSER DETECTION
-       ========================================== */
     
     if (data && data.brands) {
         // Parse User Agent Client Hints brands
@@ -146,10 +109,6 @@ async function detectPlatform() {
     else if (userAgent.includes('Chrome')) {
         browser = 'Chrome';
     }
-
-    /* ==========================================
-       LANGUAGE & COUNTRY DETECTION
-       ========================================== */
     
     let language = navigator.language || navigator.userLanguage;
     let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -165,10 +124,6 @@ async function detectPlatform() {
             confidence = 'low';
         }
     }
-
-    /* ==========================================
-       STORE RESULTS
-       ========================================== */
     
     sessionStorage.setItem('OS', os || 'Unknown');
     sessionStorage.setItem('platform', platform);
@@ -178,22 +133,6 @@ async function detectPlatform() {
     sessionStorage.setItem('language', language);
     sessionStorage.setItem('timeZone', timeZone);
     sessionStorage.setItem('country', country || 'Unknown');
-    
-    // Store raw data for debugging
-    sessionStorage.setItem('userAgent', userAgent);
-    sessionStorage.setItem('screenWidth', window.screen.width);
-    sessionStorage.setItem('screenHeight', window.screen.height);
-    sessionStorage.setItem('touchPoints', navigator.maxTouchPoints);
-
-    return {
-        os,
-        platform,
-        browser,
-        language,
-        timeZone,
-        country,
-        confidence
-    };
 }
 
 // More complete timezone to country mapping
@@ -298,38 +237,8 @@ async function onStart() {
     // Log results for debugging
     console.log("Detection Results:", detectionResult);
     
-    // Your action logic here
-    // takeAction();
-    
     // Clean up script element if it exists
     const scriptEl = document.getElementById('script-browser-compatibility');
+
     if (scriptEl) scriptEl.remove();
 }
-
-// ========================================
-// KEY RECOMMENDATIONS
-// ========================================
-
-// 1. ACCEPT LIMITATIONS
-//    - Perfect detection is impossible due to privacy features
-//    - Modern browsers intentionally limit fingerprinting
-//    - Always have fallback logic
-
-// 2. USE FEATURE DETECTION INSTEAD
-//    - Instead of "if mobile then X", use "if touch-capable then X"
-//    - Check for specific APIs rather than assuming based on platform
-
-// 3. TEST EDGE CASES
-//    - Tablets (often report as desktop)
-//    - Desktop with touch screens
-//    - Mobile browsers in "desktop mode"
-//    - Privacy-focused browsers (Brave, Firefox with resistFingerprinting)
-
-// 4. CONSIDER IP GEOLOCATION
-//    - For accurate country detection, use a geolocation API
-//    - Timezone is a decent proxy but not reliable
-
-// 5. VALIDATE ASSUMPTIONS
-//    - Log detection confidence
-//    - Monitor false positives/negatives in production
-//    - Build adaptive UIs that work regardless of detection accuracy
