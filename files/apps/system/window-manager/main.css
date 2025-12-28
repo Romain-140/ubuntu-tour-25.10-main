@@ -44,72 +44,72 @@ html {
 }
 
 .resize.left {
-    top: 3px;
-    left: -3px;
-    width: 6px;
-    height: calc(100% - 6px);
+    top: 4px;
+    left: -4px;
+    width: 8px;
+    height: calc(100% - 8px);
     cursor: ew-resize;
 }
 
 .resize.right {
     position: absolute;
-    top: 3px;
-    right: -3px;
-    width: 6px;
-    height: calc(100% - 6px);
+    top: 4px;
+    right: -4px;
+    width: 8px;
+    height: calc(100% - 8px);
     cursor: ew-resize;
 }
 
 .resize.top {
     position: absolute;
-    top: -3px;
-    left: 3px;
-    width: calc(100% - 6px);
-    height: 6px;
+    top: -4px;
+    left: 4px;
+    width: calc(100% - 8px);
+    height: 8px;
     cursor: ns-resize;
 }
 
 .resize.bottom {
     position: absolute;
-    bottom: -3px;
-    left: 3px;
-    width: calc(100% - 6px);
-    height: 6px;
+    bottom: -4px;
+    left: 4px;
+    width: calc(100% - 8px);
+    height: 8px;
     cursor: ns-resize;
 }
 
 .resize.top-left {
     position: absolute;
-    top: -3px;
-    left: -3px;
-    width: 6px;
-    height: 6px;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
     cursor: nwse-resize;
 }
 
 .resize.top-right {
     position: absolute;
-    top: -3px;
-    right: -3px;
-    width: 6px;
-    height: 6px;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
     cursor: nesw-resize;
 }
 
 .resize.bottom-left {
     position: absolute;
-    bottom: -3px;
-    right: -3px;
-    width: 6px;
-    height: 6px;
+    bottom: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
     cursor: nesw-resize;
 }
 
 .resize.bottom-right {
     position: absolute;
-    bottom: -3px;
-    right: -3px;
-    width: 6px;
-    height: 6px;
+    bottom: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
     cursor: nwse-resize;
 }

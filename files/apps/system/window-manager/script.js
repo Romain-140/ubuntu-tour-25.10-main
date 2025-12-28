@@ -94,6 +94,89 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
     });
 }
 
+function resizewindow(event, windowElement, direction) {
+    if (event.buttons !== 1) return;
+
+    let startX = windowElement.getBoundingClientRect().left,
+        startY = windowElement.getBoundingClientRect().top - 31;
+
+    let startWidth = windowElement.getBoundingClientRect().width,
+        startHeight = windowElement.getBoundingClientRect().height;
+
+    let mouseX = event.clientX,
+        mouseY = event.clientY;
+
+    function removeEvents() {
+        document.body.style.cursor = '';
+        document.removeEventListener('mouseup', removeEvents);
+
+        document.removeEventListener('mousemove', resizeLeft);
+        document.removeEventListener('mousemove', resizeRight);
+        document.removeEventListener('mousemove', resizeTop);
+        document.removeEventListener('mousemove', resizeBottom);
+    }
+
+    function resizeLeft(event) {
+        let offset = event.clientX - mouseX;
+        windowElement.style.width = `${(startWidth - offset) / window.innerWidth * 100}%`;
+        windowElement.style.left = `${(startX + offset) / window.innerWidth * 100}%`;
+    }
+
+    function resizeRight(event) {
+        let offset = event.clientX - mouseX;
+        windowElement.style.width = `${(startWidth + offset) / window.innerWidth * 100}%`;
+    }
+
+    function resizeTop(event) {
+        let offset = event.clientY - mouseY;
+        windowElement.style.height = `${(startHeight - offset) / (window.innerHeight - 31) * 100}%`;
+        windowElement.style.top = `${(startY + offset) / (window.innerHeight - 31) * 100}%`;
+    }
+
+    function resizeBottom(event) {
+        let offset = event.clientY - mouseY;
+        windowElement.style.height = `${(startHeight + offset) / (window.innerHeight - 31) * 100}%`;
+    }
+
+    if (direction === 'L') {
+        document.body.style.cursor = 'ew-resize';
+        document.addEventListener('mousemove', resizeLeft);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'R') {
+        document.body.style.cursor = 'ew-resize';
+        document.addEventListener('mousemove', resizeRight);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'T') {
+        document.body.style.cursor = 'ns-resize';
+        document.addEventListener('mousemove', resizeTop);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'B') {
+        document.body.style.cursor = 'ns-resize';
+        document.addEventListener('mousemove', resizeBottom);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'TL') {
+        document.body.style.cursor = 'nwse-resize';
+        document.addEventListener('mousemove', resizeTop);
+        document.addEventListener('mousemove', resizeLeft);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'TR') {
+        document.body.style.cursor = 'nesw-resize';
+        document.addEventListener('mousemove', resizeTop);
+        document.addEventListener('mousemove', resizeRight);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'BL') {
+        document.body.style.cursor = 'nesw-resize';
+        document.addEventListener('mousemove', resizeBottom);
+        document.addEventListener('mousemove', resizeLeft);
+        document.addEventListener('mouseup', removeEvents);
+    } else if (direction === 'BR') {
+        document.body.style.cursor = 'nwse-resize';
+        document.addEventListener('mousemove', resizeBottom);
+        document.addEventListener('mousemove', resizeRight);
+        document.addEventListener('mouseup', removeEvents);
+    }
+}
+
 function addResizeDiv(windowElement) {
     let resizeParent = document.createElement('div');
     resizeParent.classList.add('resize-parent');
@@ -103,48 +186,56 @@ function addResizeDiv(windowElement) {
     let resizeL = document.createElement('div');
     resizeL.classList.add('resize');
     resizeL.classList.add('left');
+    resizeL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'L')});
 
     // R
 
     let resizeR = document.createElement('div');
     resizeR.classList.add('resize');
     resizeR.classList.add('right');
+    resizeR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'R')});
 
     // T
 
     let resizeT = document.createElement('div');
     resizeT.classList.add('resize');
     resizeT.classList.add('top');
+    resizeT.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'T')});
 
     // B
 
     let resizeB = document.createElement('div');
     resizeB.classList.add('resize');
     resizeB.classList.add('bottom');
+    resizeB.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'B')});
 
     // TL
 
     let resizeTL = document.createElement('div');
     resizeTL.classList.add('resize');
     resizeTL.classList.add('top-left');
+    resizeTL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'TL')});
 
     // TR
 
     let resizeTR = document.createElement('div');
     resizeTR.classList.add('resize');
     resizeTR.classList.add('top-right');
+    resizeTR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'TR')});
 
     // BL
 
     let resizeBL = document.createElement('div');
     resizeBL.classList.add('resize');
     resizeBL.classList.add('bottom-left');
+    resizeBL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'BL')});
 
     // BR
 
     let resizeBR = document.createElement('div');
     resizeBR.classList.add('resize');
     resizeBR.classList.add('bottom-right');
+    resizeBR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'BR')});
 
     // Parent
 
