@@ -107,7 +107,7 @@ function resizewindow(event, windowElement, direction) {
         mouseY = event.clientY;
 
     function removeEvents() {
-        document.body.style.cursor = '';
+        document.getElementById('resize-cursor-style').remove();
         document.removeEventListener('mouseup', removeEvents);
 
         document.removeEventListener('mousemove', resizeLeft);
@@ -118,59 +118,92 @@ function resizewindow(event, windowElement, direction) {
 
     function resizeLeft(event) {
         let offset = event.clientX - mouseX;
+        let newWidth = startWidth - offset;
+
+        if (newWidth < 100) {
+            offset = startWidth - 100;
+        }
+
         windowElement.style.width = `${(startWidth - offset) / window.innerWidth * 100}%`;
         windowElement.style.left = `${(startX + offset) / window.innerWidth * 100}%`;
     }
 
     function resizeRight(event) {
         let offset = event.clientX - mouseX;
+        let newWidth = startWidth + offset;
+
+        if (newWidth < 100) {
+            offset = 100 - startWidth;
+        }
+
         windowElement.style.width = `${(startWidth + offset) / window.innerWidth * 100}%`;
     }
 
     function resizeTop(event) {
         let offset = event.clientY - mouseY;
+
+        if (event.clientY < 32) {
+            offset = 32 - mouseY;
+        }
+
+        let newHeight = startHeight - offset;
+
+        if (newHeight < 100) {
+            offset = startHeight - 100;
+        }
+
         windowElement.style.height = `${(startHeight - offset) / (window.innerHeight - 31) * 100}%`;
         windowElement.style.top = `${(startY + offset) / (window.innerHeight - 31) * 100}%`;
     }
 
     function resizeBottom(event) {
         let offset = event.clientY - mouseY;
+        let newHeight = startHeight + offset;
+
+        if (newHeight < 100) {
+            offset = 100 - startHeight;
+        }
+
         windowElement.style.height = `${(startHeight + offset) / (window.innerHeight - 31) * 100}%`;
     }
 
+    let cursorStyle = document.createElement('style');
+    cursorStyle.id = "resize-cursor-style";
+    document.head.appendChild(cursorStyle);
+
     if (direction === 'L') {
-        document.body.style.cursor = 'ew-resize';
+        cursorStyle.innerHTML = "*{cursor: ew-resize !important}";
         document.addEventListener('mousemove', resizeLeft);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'R') {
-        document.body.style.cursor = 'ew-resize';
+        cursorStyle.innerHTML = "*{cursor: ew-resize !important}";
         document.addEventListener('mousemove', resizeRight);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'T') {
-        document.body.style.cursor = 'ns-resize';
+        cursorStyle.innerHTML = "*{cursor: ns-resize !important}";
         document.addEventListener('mousemove', resizeTop);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'B') {
-        document.body.style.cursor = 'ns-resize';
+        cursorStyle.innerHTML = "*{cursor: ns-resize !important}";
         document.addEventListener('mousemove', resizeBottom);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'TL') {
-        document.body.style.cursor = 'nwse-resize';
+        cursorStyle.innerHTML = "*{cursor: nwse-resize !important}";
         document.addEventListener('mousemove', resizeTop);
         document.addEventListener('mousemove', resizeLeft);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'TR') {
-        document.body.style.cursor = 'nesw-resize';
+        cursorStyle.innerHTML = "*{cursor: nesw-resize !important}";
         document.addEventListener('mousemove', resizeTop);
         document.addEventListener('mousemove', resizeRight);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'BL') {
-        document.body.style.cursor = 'nesw-resize';
+        cursorStyle.innerHTML = "*{cursor: nesw-resize !important}";
         document.addEventListener('mousemove', resizeBottom);
         document.addEventListener('mousemove', resizeLeft);
         document.addEventListener('mouseup', removeEvents);
     } else if (direction === 'BR') {
-        document.body.style.cursor = 'nwse-resize';
+        cursorStyle.innerHTML = "*{cursor: nwse-resize !important}";
         document.addEventListener('mousemove', resizeBottom);
         document.addEventListener('mousemove', resizeRight);
         document.addEventListener('mouseup', removeEvents);
