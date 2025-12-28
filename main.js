@@ -33,15 +33,6 @@ function loadApp(name) {
   script = document.getElementById(`script-${name}`);
   script.onload = () => { onStart() }
 
-
-  // Add style
-
-  /* var style = document.createElement('link');
-  style.href = `./files/apps/${appData["type"]}/${appData["name"]}/main.css`;
-  style.rel = 'stylesheet';
-
-  document.head.appendChild(style); */ // Inside script.js
-
   return;
 }
 

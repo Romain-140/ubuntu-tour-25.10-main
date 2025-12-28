@@ -3,6 +3,7 @@
 function taskWindow(windowElement, draggableChildren, idNumber) {
     windowElement.id = `window-${idNumber}`;
     setToFirstPlan(windowElement);
+    addResizeDiv(windowElement);
 
     let offsetX = 0,
         offsetY = 0,
@@ -53,6 +54,14 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
         if (newTop <= 0) {
             newTop = 1;
+        } else if (newTop > window.innerHeight - 100) {
+            newTop = window.innerHeight - 100;
+        }
+
+        if (newLeft < 100 - windowElement.getBoundingClientRect().width) {
+            newLeft = 100 - windowElement.getBoundingClientRect().width;
+        } else if (newLeft > window.innerWidth - 100) {
+            newLeft = window.innerWidth - 100;
         }
 
         windowElement.style.left = 100 * newLeft / window.innerWidth + '%';
@@ -85,14 +94,83 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
     });
 }
 
+function addResizeDiv(windowElement) {
+    let resizeParent = document.createElement('div');
+    resizeParent.classList.add('resize-parent');
+
+    // L
+    
+    let resizeL = document.createElement('div');
+    resizeL.classList.add('resize');
+    resizeL.classList.add('left');
+
+    // R
+
+    let resizeR = document.createElement('div');
+    resizeR.classList.add('resize');
+    resizeR.classList.add('right');
+
+    // T
+
+    let resizeT = document.createElement('div');
+    resizeT.classList.add('resize');
+    resizeT.classList.add('top');
+
+    // B
+
+    let resizeB = document.createElement('div');
+    resizeB.classList.add('resize');
+    resizeB.classList.add('bottom');
+
+    // TL
+
+    let resizeTL = document.createElement('div');
+    resizeTL.classList.add('resize');
+    resizeTL.classList.add('top-left');
+
+    // TR
+
+    let resizeTR = document.createElement('div');
+    resizeTR.classList.add('resize');
+    resizeTR.classList.add('top-right');
+
+    // BL
+
+    let resizeBL = document.createElement('div');
+    resizeBL.classList.add('resize');
+    resizeBL.classList.add('bottom-left');
+
+    // BR
+
+    let resizeBR = document.createElement('div');
+    resizeBR.classList.add('resize');
+    resizeBR.classList.add('bottom-right');
+
+    // Parent
+
+    resizeParent.appendChild(resizeR);
+    resizeParent.appendChild(resizeL);
+    resizeParent.appendChild(resizeT);
+    resizeParent.appendChild(resizeB);
+
+    resizeParent.appendChild(resizeTL);
+    resizeParent.appendChild(resizeTR);
+    resizeParent.appendChild(resizeBL);
+    resizeParent.appendChild(resizeBR);
+
+    windowElement.appendChild(resizeParent);
+}
+
 function removeFullscreen(windowElement) {
     windowElement.classList.remove('fullscreen');
     setTimeout(() => {windowElement.style.transition = ''}, 300);
+    addResizeDiv(windowElement);
 }
 
 function fullScreen(windowElement) {
     windowElement.style.transition = 'all .25s';
     windowElement.classList.add('fullscreen');
+    windowElement.getElementsByClassName('resize-parent')[0].remove();
 }
 
 function setToFirstPlan(currentWindow) {
