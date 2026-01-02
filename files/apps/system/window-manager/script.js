@@ -10,6 +10,8 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         mouseX = 0,
         mouseY = 0;
 
+    let event;
+
     function isDraggableChild(target) {
         return draggableChildren.includes(target);
     }
@@ -20,6 +22,9 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         setToFirstPlan(windowElement);
 
         if (e.button === 2) {
+            openWindowContextMenu(e);
+            return;
+
             if (windowElement.classList[1] === 'fullscreen') {removeFullscreen(windowElement); return}
 
             fullScreen(windowElement);
@@ -39,6 +44,35 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         document.onmousemove = moveWindow;
         document.onmouseup = stopDragging;
     };
+
+    function openWindowContextMenu(e) {
+        let jsonInfo = document.getElementById('json-data');
+
+        const menu = document.createElement('div');
+        menu.id = `window-${idNumber}-menu`;
+        menu.classList.add('custom-menu');
+        menu.style.display = 'block';
+        menu.style.top = `${(e.clientY - 31) / (window.innerHeight - 31) * 100}%`;
+        menu.style.left = `${e.clientX / window.innerWidth * 100}%`;
+        menu.innerHTML = JSON.parse(jsonInfo.innerHTML)[e.target.classList.value];
+
+        if (menu.innerHTML === 'undefined') return;
+
+        windowElement.parentElement.appendChild(menu);
+
+        event = e;
+
+        document.addEventListener('mousedown', closeWindowContextMenu);
+    };
+
+    function closeWindowContextMenu(e) {
+        if (event === e) return;
+        document.getElementById(`window-${idNumber}-menu`).classList.add('disappear');
+        setTimeout(function() {
+            document.getElementById(`window-${idNumber}-menu`).remove();
+            document.removeEventListener('mousedown', closeWindowContextMenu);
+        }, 75)
+    }
 
 
     function moveWindow(e) {
@@ -97,6 +131,9 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 function resizewindow(event, windowElement, direction) {
     if (event.buttons !== 1) return;
 
+    const minXSize = Number(windowElement.getAttribute('minx')) || 100;
+    const minYSize = Number(windowElement.getAttribute('miny')) || 100;
+
     let startX = windowElement.getBoundingClientRect().left,
         startY = windowElement.getBoundingClientRect().top - 31;
 
@@ -120,8 +157,8 @@ function resizewindow(event, windowElement, direction) {
         let offset = event.clientX - mouseX;
         let newWidth = startWidth - offset;
 
-        if (newWidth < 100) {
-            offset = startWidth - 100;
+        if (newWidth < minXSize) {
+            offset = startWidth - minXSize;
         }
 
         windowElement.style.width = `${(startWidth - offset) / window.innerWidth * 100}%`;
@@ -132,8 +169,8 @@ function resizewindow(event, windowElement, direction) {
         let offset = event.clientX - mouseX;
         let newWidth = startWidth + offset;
 
-        if (newWidth < 100) {
-            offset = 100 - startWidth;
+        if (newWidth < minXSize) {
+            offset = minXSize - startWidth;
         }
 
         windowElement.style.width = `${(startWidth + offset) / window.innerWidth * 100}%`;
@@ -148,8 +185,8 @@ function resizewindow(event, windowElement, direction) {
 
         let newHeight = startHeight - offset;
 
-        if (newHeight < 100) {
-            offset = startHeight - 100;
+        if (newHeight < minYSize) {
+            offset = startHeight - minYSize;
         }
 
         windowElement.style.height = `${(startHeight - offset) / (window.innerHeight - 31) * 100}%`;
@@ -160,8 +197,8 @@ function resizewindow(event, windowElement, direction) {
         let offset = event.clientY - mouseY;
         let newHeight = startHeight + offset;
 
-        if (newHeight < 100) {
-            offset = 100 - startHeight;
+        if (newHeight < minYSize) {
+            offset = minYSize - startHeight;
         }
 
         windowElement.style.height = `${(startHeight + offset) / (window.innerHeight - 31) * 100}%`;
@@ -345,7 +382,7 @@ function onStart() {
     // document.getElementById('script-window-manager').outerHTML = '';
     document.getElementById('option-2').addEventListener('click', () => {
         let window = document.createElement('div');
-        window.innerHTML = "<div id='window-test' class='window' style='position: absolute; top: 20%; left: 20%; z-index: 1'><div class='window-test-topbar draggable'></div></div>"
+        window.innerHTML = "<div id='window-test' class='window' style='position: absolute; top: 20%; left: 20%; z-index: 1' minx='200' miny='50'><div class='window-test-topbar draggable'></div></div>"
         let windowSpace = document.getElementById('window-space');
         windowSpace.appendChild(window);
         createWindow(document.getElementById('window-test'));

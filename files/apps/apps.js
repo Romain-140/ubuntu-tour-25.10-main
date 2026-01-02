@@ -1,4 +1,8 @@
 const jsonContent = '{\
+    "data" : {\
+        "type" : "system",\
+        "name" : "data"\
+    },\
     "start-menu" : {\
         "type" : "system",\
         "name" : "start-menu"\

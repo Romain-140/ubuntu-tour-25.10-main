@@ -102,8 +102,10 @@ function createBackgroundDiv() {
 }
 
 function createMenuDiv() {
+    let JSONData = document.getElementById('json-data');
+
     const menu = document.createElement('div');
-    menu.innerHTML = "<ul><li><a id='option-1'>Notification Test</a></li><li><a id='option-2'>Window Test</a></li><li><a>Custom Option 3</a></li><hr><li><a>Option 4</a></li></ul>";
+    menu.innerHTML = JSON.parse(JSONData.innerHTML)["main-menu"];
     menu.id = "custom-menu";
     menu.classList.add("custom-menu");
     document.body.appendChild(menu);
@@ -381,7 +383,11 @@ function addStyle() {
     document.head.appendChild(mainStyle);
 }
 
-function onStart() {
+async function onStart() {
+
+    loadApp('data');
+
+    await new Promise(r => setTimeout(r, 50));
 
     // Home Menu
     createMenuDiv();
