@@ -48,13 +48,28 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         menu.id = `window-${idNumber}-menu`;
         menu.classList.add('custom-menu');
         menu.style.display = 'block';
-        menu.style.top = `${(e.clientY - 31) / (window.innerHeight - 31) * 100}%`;
-        menu.style.left = `${e.clientX / window.innerWidth * 100}%`;
         menu.innerHTML = JSON.parse(jsonInfo.innerHTML)[e.target.classList.value];
 
         if (menu.innerHTML === 'undefined') return;
 
         windowElement.parentElement.appendChild(menu);
+
+        let width = menu.getBoundingClientRect().width,
+            height = menu.getBoundingClientRect().height;
+
+        // Prevent screen overflow
+
+        if (e.clientY + height >= window.innerHeight - 31) {
+            menu.style.top = `${(e.clientY - 31 - height) / (window.innerHeight - 31) * 100}%`;
+        } else {
+            menu.style.top = `${(e.clientY - 31) / (window.innerHeight - 31) * 100}%`;
+        }
+
+        if (e.clientX + width >= window.innerWidth) {
+            menu.style.left = `${(e.clientX - width) / window.innerWidth * 100}%`;
+        } else {
+            menu.style.left = `${e.clientX / window.innerWidth * 100}%`;
+        }
 
         if (e.target.classList.value === "window-test-topbar draggable") addContextMenuFunctions(menu);
 
