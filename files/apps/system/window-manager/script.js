@@ -89,8 +89,14 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
     }
 
     function addContextMenuFunctions(menu) {
-        document.getElementById('window-fullscreen').addEventListener('mousedown', () => {fullScreen(windowElement)});
-        document.getElementById('window-close').addEventListener('mousedown', () => {closeWindow(windowElement)});
+        document.getElementById('window-fullscreen').addEventListener('mousedown', (e) => {
+            if (e.buttons !== 1) {event = e; return}
+            fullScreen(windowElement);
+        });
+        document.getElementById('window-close').addEventListener('mousedown', (e) => {
+            if (e.buttons !== 1) {event = e; return}
+            closeWindow(windowElement);
+        });
     }
 
     function moveWindow(e) {
