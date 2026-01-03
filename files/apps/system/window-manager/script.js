@@ -24,12 +24,6 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         if (e.button === 2) {
             openWindowContextMenu(e);
             return;
-
-            if (windowElement.classList[1] === 'fullscreen') {removeFullscreen(windowElement); return}
-
-            fullScreen(windowElement);
-
-            return
         }
 
         if (!isDraggableChild(e.target)) return;
@@ -48,6 +42,8 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
     function openWindowContextMenu(e) {
         let jsonInfo = document.getElementById('json-data');
 
+        if (document.getElementById(`window-${idNumber}-menu`)) return;
+
         const menu = document.createElement('div');
         menu.id = `window-${idNumber}-menu`;
         menu.classList.add('custom-menu');
@@ -60,6 +56,8 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
         windowElement.parentElement.appendChild(menu);
 
+        if (e.target.classList.value === "window-test-topbar draggable") addContextMenuFunctions(menu);
+
         event = e;
 
         document.addEventListener('mousedown', closeWindowContextMenu);
@@ -67,13 +65,18 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
 
     function closeWindowContextMenu(e) {
         if (event === e) return;
+        event = e;
         document.getElementById(`window-${idNumber}-menu`).classList.add('disappear');
         setTimeout(function() {
-            document.getElementById(`window-${idNumber}-menu`).remove();
             document.removeEventListener('mousedown', closeWindowContextMenu);
+            document.getElementById(`window-${idNumber}-menu`).remove();
         }, 75)
     }
 
+    function addContextMenuFunctions(menu) {
+        document.getElementById('window-fullscreen').addEventListener('mousedown', () => {fullScreen(windowElement)});
+        document.getElementById('window-close').addEventListener('mousedown', () => {closeWindow(windowElement)});
+    }
 
     function moveWindow(e) {
         e.preventDefault();
@@ -107,25 +110,10 @@ function taskWindow(windowElement, draggableChildren, idNumber) {
         document.onmouseup = null;
     }
 
-    let closeBtn = document.getElementById(`close-btn-${idNumber}`);
-    let startX = 0;
-    let startY = 0;
-
-    closeBtn.addEventListener('mousedown', (e) => {
-        startX = e.clientX;
-        startY = e.clientY;
-    });
-
-    closeBtn.addEventListener('mouseup', (e) => {
-        const endX = e.clientX;
-        const endY = e.clientY;
-        const distance = Math.hypot(endX - startX, endY - startY);
-
-        if (distance < 3) {
-            windowElement.classList.add('close-window');
-            setTimeout(() => { document.body.removeChild(windowElement.parentElement) }, 200);
-        }
-    });
+    function closeWindow(windowElement) {
+        windowElement.classList.add('remove');
+        setTimeout(() => {windowElement.parentElement.remove()}, 150)
+    }
 }
 
 function resizewindow(event, windowElement, direction) {
@@ -329,6 +317,11 @@ function removeFullscreen(windowElement) {
 }
 
 function fullScreen(windowElement) {
+    if (windowElement.classList.value.includes('fullscreen')) {
+        removeFullscreen(windowElement);
+        return
+    }
+
     windowElement.style.transition = 'all .25s';
     windowElement.classList.add('fullscreen');
     windowElement.getElementsByClassName('resize-parent')[0].remove();
