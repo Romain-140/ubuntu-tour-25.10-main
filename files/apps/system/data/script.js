@@ -1,4 +1,4 @@
-const data = {
+let data = {
     "window-test-topbar draggable": "<ul><li><a id='window-fullscreen'>Fullscreen</a></li><li><a id='window-close'>Close Window</a></li></ul>",
     "main-menu": "<ul><li><a id='option-1'>Notification Test</a></li><li><a id='option-2'>Window Test</a></li><li><a>Custom Option 3</a></li><hr><li><a>Option 4</a></li></ul>",
     "connection-icons": {
@@ -14,8 +14,8 @@ const data = {
         3 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Zm40-560h240v-80H360v80Z"/></svg>',
         4 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Z"/></svg>',
         "charging" : '<svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#e3e3e3"><g transform="scale(0.7)"><path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Zm151-390Z"/></g></svg>'
-    }
-
+    },
+    "top-right-menu menu": '<!-- Fist line --> <div class="menu-battery" id="menu-battery"></div> <div style="grid-column: span 2"></div> <div class="menu-item"></div> <div class="menu-item"></div> <div class="menu-item"></div> <div class="menu-item"></div> <!-- Second line --> <div class="menu-icon sound-icon" id="menu-sound-icon"></div> <input type="range" id="sound-selection" class="menu-range" min="0" max="1" value="0.3" step="0.01" /> <!-- Third line --> <div class="menu-icon brightness-icon" id="menu-brightness-icon"></div> <input type="range" id="brightness-selection" class="menu-range" min="0" max="1" value="1" step="0.01" /> <!-- Fourth line -->'
 };
 
 function onStart() {

@@ -298,6 +298,8 @@ function addTopRightElements() {
 
 function addTopBarMenues() {
 
+    let JSONData = document.getElementById('json-data');
+
     // Time
 
     let timeDiv = document.getElementById('time');
@@ -348,6 +350,8 @@ function addTopBarMenues() {
             let menuDiv = document.createElement('div');
             menuDiv.classList.add('top-right-menu');
             menuDiv.classList.add('menu');
+
+            menuDiv.innerHTML = JSON.parse(JSONData.innerHTML)[menuDiv.classList.value];
             // // // TODO: add light, battery, [screenshot, lock, settings, turn off], parametters
             document.body.appendChild(menuDiv);
 

@@ -10,7 +10,7 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 ## TODO
 * [x] Finish window manager
 * [x] Finish browser compatibility module
-* [ ] Add variable minimal window size (as an atribute)
+* [x] Add variable minimal window size (as an atribute)
 * [ ] Add OS tools (network, battery, sound, notification, luminosity)
 * [ ] Add settings app
 * [ ] Clean up

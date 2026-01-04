@@ -46,6 +46,43 @@ body  {
     border-color: rgb(255, 76, 0);
 }
 
+/* Range Input */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #5a5a5a;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  position: relative;
+}
+
+input[type="range"]::-moz-range-progress {
+  background: rgb(235, 66, 0);
+  height: 4px;
+  border-radius: 5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-range {
+    grid-column: span 7;
+    align-self: center;
+}
+
 /* Custom Menu */
 
 @keyframes customMenuAppear {
@@ -188,13 +225,16 @@ body  {
 }
 
 .top-right-menu {
-    height: 50%;
+    height: 35%;
     width: 20%;
     top: 40px;
     right: 8px;
+    grid-template-columns: repeat(8, calc(100% / 8));
+    grid-template-rows: repeat(7, calc(100% / 7));
 }
 
 .menu {
+    display: grid;
     position: absolute;
 
     border: solid;
@@ -210,6 +250,31 @@ body  {
     padding: 7px;
 
     animation: openTopBarMenu .15s;
+}
+
+.menu-battery {
+    margin: 7px 10px;
+    aspect-ratio: 2;
+    border-radius: 50vh;
+    grid-column: span 2;
+    background-color: #333;
+    transition: background-color .1s;
+}
+
+.menu-item {
+    margin: 7px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: #333;
+    transition: background-color .1s;
+}
+
+.menu-battery:hover {
+    background-color: #444;
+}
+
+.menu-item:hover {
+    background-color: #444;
 }
 
 .menu.remove {
