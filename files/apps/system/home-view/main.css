@@ -230,7 +230,7 @@ input[type="range"]::-moz-range-thumb {
     top: 40px;
     right: 8px;
     grid-template-columns: repeat(8, calc(100% / 8));
-    grid-template-rows: repeat(7, calc(100% / 7));
+    grid-template-rows: repeat(6, calc(100% / 6));
 }
 
 .menu {
@@ -275,6 +275,67 @@ input[type="range"]::-moz-range-thumb {
 
 .menu-item:hover {
     background-color: #444;
+}
+
+.large-menu-item {
+    grid-column: span 4;
+}
+
+.large-menu-item {
+    margin: 0 10px 10px;
+}
+
+.large-menu-item.single-item {
+    transition: all .1s;
+    border-radius: 50vh;
+}
+
+.large-menu-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.large-menu-left {
+    width: 77%;
+    height: 100%;
+    border-radius: 50vh 0 0 50vh;
+    transition: all .1s;
+}
+
+/* ON / OFF */
+
+.off.large-menu-item.single-item {
+    background-color: #333;
+}
+
+.off.large-menu-item.single-item:hover {
+    background-color: #383838;
+}
+
+.off .large-menu-left {
+    background-color: #333;
+}
+
+.off .large-menu-left:hover {
+    background-color: #383838;
+}
+
+.large-menu-right {
+    width: calc(23% - 1px);
+    height: 100%;
+    border-radius: 0 50vh 50vh 0;
+    border: solid;
+    border-width: 0 0 0 1px;
+    border-color: #555;
+    transition: all .1s;
+}
+
+.off .large-menu-right {
+    background-color: #444;
+}
+
+.off .large-menu-right:hover {
+    background-color: #505050;
 }
 
 .menu.remove {
