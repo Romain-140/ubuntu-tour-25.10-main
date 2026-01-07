@@ -283,6 +283,8 @@ input[type="range"]::-moz-range-thumb {
 
 .large-menu-item {
     margin: 0 10px 10px;
+    color: white;
+    display: flex;
 }
 
 .large-menu-item.single-item {
@@ -295,11 +297,36 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: row;
 }
 
+.large-menu-icon {
+    width: 23.1%;
+    height: 100%;
+    border-radius: 50vh 0 0 50vh;
+    /* background-color: black; */
+}
+
+.large-menu-icon.left {
+    width: 30%;
+}
+
 .large-menu-left {
+    display: flex;
     width: 77%;
     height: 100%;
     border-radius: 50vh 0 0 50vh;
     transition: all .1s;
+}
+
+.large-menu-text {
+    display: grid;
+    font-weight: 700;
+    text-align: center;
+    align-content: center;
+}
+
+.performance-subtext {
+    font-size: 12px;
+    font-weight: 100;
+    text-align: left;
 }
 
 /* ON / OFF */

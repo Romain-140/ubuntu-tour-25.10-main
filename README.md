@@ -11,12 +11,13 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 * [x] Finish window manager
 * [x] Finish browser compatibility module
 * [x] Add variable minimal window size (as an atribute)
-* [ ] Add OS tools (network, battery, sound, notification, luminosity)
+* [ ] Add OS tools (network, battery, sound, brightness)
 * [ ] Clean up
+* [ ] Add notification (apps)
 * [ ] Clean up (again)
-* [ ] Clean up (last time I swear)
 * [ ] Use global vars for main CSS colors
 * [ ] Add settings app
+* [ ] Clean up (last time I swear)
 
 ## Info
 Created for Firefox (possible compatibility issues with others browsers)\

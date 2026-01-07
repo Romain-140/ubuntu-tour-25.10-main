@@ -15,7 +15,25 @@ let data = {
         4 : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M320-80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v640q0 17-11.5 28.5T640-80H320Z"/></svg>',
         "charging" : '<svg xmlns="http://www.w3.org/2000/svg" height="12px" viewBox="0 -960 960 960" width="12px" fill="#e3e3e3"><g transform="scale(0.7)"><path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Zm151-390Z"/></g></svg>'
     },
-    "top-right-menu menu": '<!-- First line --> <div class="menu-battery" id="menu-battery"></div><div style="grid-column: span 2"></div><div class="menu-item"></div><div class="menu-item"></div><div class="menu-item"></div><div class="menu-item"></div><!-- Second line --> <div class="menu-icon sound-icon" id="menu-sound-icon"></div><input type="range" id="sound-selection" class="menu-range" min="0" max="1" value="0.3" step="0.01" /><!-- Third line --> <div class="menu-icon brightness-icon" id="menu-brightness-icon"></div><input type="range" id="brightness-selection" class="menu-range" min="0" max="1" value="1" step="0.01" /><!-- Fourth line --> <div style="grid-column: span 8;"></div><!-- Fifth line --> <div class="large-menu-item large-menu-container off" id="menu-performance-item"><div class="large-menu-left" id="performance-quick-switch"></div><div class="large-menu-right" id="performance-settings"></div></div><div class="large-menu-item off single-item" id="menu-night-light"></div><!-- Sixth line --> <div class="large-menu-item off single-item" id="menu-dark-style"></div><div class="large-menu-item off single-item" id="menu-dot-not-disturb"></div>'
+    "top-right-menu menu": '<div class="menu-battery" id="menu-battery"></div><div style="grid-column: span 2"></div><div class="menu-item" id="menu-screenshot"></div><div class="menu-item" id="menu-settings"></div><div class="menu-item" id="menu-lock"></div><div class="menu-item" id="menu-shutdown"></div><div class="menu-icon sound-icon" id="menu-sound-icon"></div><input type="range" id="sound-selection" class="menu-range" min="0" max="1" value="0.3" step="0.01" /><div class="menu-icon brightness-icon" id="menu-brightness-icon"></div><input type="range" id="brightness-selection" class="menu-range" min="0" max="1" value="1" step="0.01" /><div style="grid-column: span 8;"></div><div class="large-menu-item large-menu-container off" id="menu-performance-item"><div class="large-menu-left" id="performance-quick-switch"><div class="large-menu-icon left" id="performance-icon"></div><div class="large-menu-text">Power Mode<br/><span class="performance-subtext">Balanced</span></div></div><div class="large-menu-right" id="performance-settings"></div></div><div class="large-menu-item off single-item" id="menu-night-light"><div class="large-menu-icon" id="night-light-icon"></div><div class="large-menu-text">Night Light</div></div><div class="large-menu-item off single-item" id="menu-dark-style"><div class="large-menu-icon" id="dark-style-icon"></div><div class="large-menu-text">Dark Style</div></div><div class="large-menu-item off single-item" id="menu-dot-not-disturb"><div class="large-menu-icon" id="do-not-disturb-icon"></div><div class="large-menu-text">Do Not Disturb</div></div>',
+    "top-right-menu-icons": {
+        "performances": {
+            "battery": '',
+            "balanced": '',
+            "performance": ''
+        },
+        "night-light": '',
+        "dark-style": '',
+        "dot-not-disturb": '',
+
+        "brightness": '',
+        "sound": '',
+        "screenshot": '',
+        "settings": '',
+        "lock": '',
+        "shutdown": ''
+    },
+    "arrow-right-1" : '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>',
 };
 
 function onStart() {
@@ -23,3 +41,5 @@ function onStart() {
     jsonElement.id = 'json-data';
     jsonElement.innerHTML = JSON.stringify(data);
 }
+
+// TODO find icons (look into Ubuntu system files)
