@@ -173,16 +173,16 @@ function addUpdateElementsTopRight() {
     if (localStorage.getItem('networkUpdate')) {
         setInterval(() => {
             let connectionType = navigator.connection.effectiveType;
-            let quality = 0;
+            let quality = "low";
 
             let icons = JSON.parse(JSONData.innerHTML)["connection-icons"]
 
             if (connectionType === '4g') {
-                quality = 3;
+                quality = "high";
             } else if (connectionType === '3g') {
-                quality = 2;
+                quality = "medium";
             } else if (connectionType === '2g') {
-                quality = 1;
+                quality = "low";
             }
 
             let netowrkElement = document.getElementById('network');
@@ -209,31 +209,30 @@ function addUpdateElementsTopRight() {
             batteryElement.innerHTML = '';
 
             if (batteryData.charging)  {
-                let icon = document.createElement('svg');
-                icon.innerHTML = charging;  
-                icon.style.width = "10px";
-                batteryElement.appendChild(icon);
+                icons = icons['charging'];
+            } else {
+                icons = icons['discharging'];
             }
 
             if (batteryData.level < 0.1) {
                 let icon = document.createElement('svg');
-                icon.innerHTML = icons[0];
+                icon.innerHTML = icons["empty"];
                 batteryElement.appendChild(icon);
-            } else if (batteryData.level < 0.2) {
+            } else if (batteryData.level < 0.3) {
                 let icon = document.createElement('svg');
-                icon.innerHTML = icons[1];
+                icon.innerHTML = icons["low"];
                 batteryElement.appendChild(icon);
             } else if (batteryData.level < 0.5) {
                 let icon = document.createElement('svg');
-                icon.innerHTML = icons[2];
+                icon.innerHTML = icons["medium"];
                 batteryElement.appendChild(icon);
             } else if (batteryData.level < 0.8) {
                 let icon = document.createElement('svg');
-                icon.innerHTML = icons[3];
+                icon.innerHTML = icons["high"];
                 batteryElement.appendChild(icon);
             } else {
                 let icon = document.createElement('svg');
-                icon.innerHTML = icons[4];
+                icon.innerHTML = icons["full"];
                 batteryElement.appendChild(icon);
             }
         }, 3000)
@@ -241,6 +240,8 @@ function addUpdateElementsTopRight() {
 }
 
 function addTopRightElements() {
+    let JSONData = document.getElementById('json-data');
+
     let elements = document.createElement('div');
     elements.classList.add('item');
     elements.classList.add('top-bar-right');
@@ -256,7 +257,7 @@ function addTopRightElements() {
     networkElement.classList.add('icon');
 
     let networkIcon = document.createElement('div');
-    networkIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-120 0-600q95-97 219.5-148.5T480-800q136 0 260.5 51.5T960-600l-40 40q-28-36-69.5-58T760-640q-83 0-141.5 58.5T560-440q0 49 22 90.5t58 69.5L480-120Zm280-40q-17 0-29.5-12.5T718-202q0-17 12.5-29.5T760-244q17 0 29.5 12.5T802-202q0 17-12.5 29.5T760-160Zm-30-128q0-38 10-59t43-54q21-21 27-31.5t6-26.5q0-18-14-31.5T765-504q-21 0-39 13.5T700-454l-54-22q12-38 44-61t75-23q49 0 80 29t31 74q0 23-10 41t-38 46q-24 24-30 38.5t-6 43.5h-62Z"/></svg>';
+    networkIcon.innerHTML = JSON.parse(JSONData.innerHTML)["connection-error"];
     networkElement.appendChild(networkIcon);
 
     if (navigator.connection) localStorage.setItem('networkUpdate', true);
@@ -269,7 +270,7 @@ function addTopRightElements() {
     soundElement.classList.add('icon');
 
     let soundIcon = document.createElement('svg');
-    soundIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/></svg>';
+    soundIcon.innerHTML = JSON.parse(JSONData.innerHTML)["sound-icons"]["medium"];
     soundElement.appendChild(soundIcon.children.item(0));
 
     // Battery
@@ -280,7 +281,7 @@ function addTopRightElements() {
     batteryElement.classList.add('icon');
 
     let batteryIcon = document.createElement('svg');
-    batteryIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M656-182q0-14 .5-27.5T664-235q10-17 25.5-29t26.5-28q3-4 7-23 0-17-13-28t-30-11q-17 0-30 11t-18 28l-44-19q10-30 35-48t57-18q37 0 64.5 24t27.5 60q0 11-3 20.5t-9 17.5q-11 16-26 28.5T710-220q-6 11-6 38h-48Zm24 102q-14 0-24-9.5T646-113q0-14 10-24t24-10q14 0 23.5 10t9.5 24q0 14-9.5 23.5T680-80Zm-320-80Zm-40 80q-17 0-28.5-11.5T280-120v-640q0-17 11.5-28.5T320-800h80v-80h160v80h80q17 0 28.5 11.5T680-760v280q-21 0-41 3.5T600-466v-254H360v560h94q8 23 19.5 43T501-80H320Z"/></svg>';
+    batteryIcon.innerHTML = JSON.parse(JSONData.innerHTML)["battery-error"];
     batteryElement.appendChild(batteryIcon.children.item(0));
 
     if (navigator.userAgentData) localStorage.setItem('batteryUpdate', true);
@@ -352,8 +353,9 @@ function addTopBarMenues() {
             menuDiv.classList.add('menu');
 
             menuDiv.innerHTML = JSON.parse(JSONData.innerHTML)[menuDiv.classList.value];
-            // // // TODO: add light, battery, [screenshot, lock, settings, turn off], parametters
             document.body.appendChild(menuDiv);
+
+            loadTopRightMenuIcons();
 
             document.addEventListener('mousedown', removeMenu);
         }
@@ -361,6 +363,55 @@ function addTopBarMenues() {
 
     rightDiv.addEventListener('mousedown', addTopRightMenu);
 
+}
+
+function addCustomInputEvents() {
+
+    function checkRangeInputs() {
+
+        function setupElement(e) {
+
+            let element = e.target;
+
+            if (e.buttons === 2) return;
+
+            let width = e.target.parentElement.getBoundingClientRect().width;
+            let startX = e.target.parentElement.getBoundingClientRect().x;
+
+            function removeAllListeners() {
+                document.removeEventListener('mousemove', moveRange);
+                document.removeEventListener('mouseup', removeAllListeners);
+            }
+
+            function moveRange(e) {
+                let offsetX = e.clientX - startX;
+                element.parentElement.style.setProperty('--value', `${offsetX / width}`);
+            }
+
+            function focusRange() {
+                document.addEventListener('mousemove', moveRange);
+                document.addEventListener('mouseup', removeAllListeners);
+            }
+
+            focusRange()
+        }
+
+        let elements = document.querySelectorAll('.custom-input[type="range"]');
+
+        if (!elements) return;
+
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements[i];
+            if (element.classList.value.includes('setup')) continue;
+
+            element.classList.add('setup');
+            element.firstChild.addEventListener('mousedown', setupElement);
+        }
+    }
+
+    
+
+    setInterval(checkRangeInputs, 100);
 }
 
 function addWindowSpace() {
@@ -403,9 +454,11 @@ async function onStart() {
     addWindowSpace();
     loadApp('notification-manager');
     loadApp('window-manager');
+    loadApp('icon-loader');
 
     // Load after
     addSelectionDivInteration();
+    addCustomInputEvents();
 
     loadApp('browser-compatibility');
 

@@ -3,6 +3,10 @@ const jsonContent = '{\
         "type" : "system",\
         "name" : "data"\
     },\
+    "icon-loader": {\
+        "type" : "system",\
+        "name" : "icon-loader"\
+    },\
     "start-menu" : {\
         "type" : "system",\
         "name" : "start-menu"\

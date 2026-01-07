@@ -5,4 +5,4 @@ index.html
 window-template.html
 files/**/location
 .gitignore
-test.*
+test*.*

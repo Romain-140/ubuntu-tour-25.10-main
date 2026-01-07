@@ -1,3 +1,7 @@
+:root {
+    --value: 0;
+}
+
 /* Fonts */
 
 @font-face {
@@ -48,34 +52,51 @@ body  {
 
 /* Range Input */
 
-input[type="range"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  height: 4px;
-  background: #5a5a5a;
-  border: none;
-  border-radius: 5px;
-  outline: none;
-  position: relative;
+/* Custom Input */
+
+.custom-input[type="range"] {
+    display: flex;
+    cursor: pointer;
+    height: 0;
+    width: 100%;
 }
 
-input[type="range"]::-moz-range-progress {
-  background: rgb(235, 66, 0);
-  height: 4px;
-  border-radius: 5px;
+.custom-input[type="range"] .selector {
+    z-index: 2;
+    display: block;
+    position: relative;
+    top: -7px;
+    left: calc(var(--value) * 100% - 9px);
+    height: 18px;
+    width: 18px;
+    border-radius: 50vh;
+    background-color: #dedede;
+    transition: background-color .05s;
 }
 
-input[type="range"]::-moz-range-thumb {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  border: none;
-  cursor: pointer;
+.custom-input[type="range"] .selector:hover {
+    background-color: #fff;
+}
+
+.custom-input[type="range"]::before {
+    position: absolute;
+    display: block;
+    border-radius: 5px;
+    content: "";
+    height: 4px;
+    width: calc(var(--value) * (100% - 14px));
+    background-color: rgb(235, 66, 0);
+}
+
+.custom-input[type="range"]::after {
+    position: absolute;
+    left: calc(var(--value) * 100% + 7px);
+    display: block;
+    border-radius: 5px;
+    content: "";
+    height: 4px;
+    width: calc((1 - var(--value)) * (100% - 14px));
+    background-color: #5a5a5a;
 }
 
 .menu-range {
