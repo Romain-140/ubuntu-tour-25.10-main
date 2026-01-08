@@ -351,9 +351,20 @@ function addTopBarMenues() {
             let menuDiv = document.createElement('div');
             menuDiv.classList.add('top-right-menu');
             menuDiv.classList.add('menu');
-
             menuDiv.innerHTML = JSON.parse(JSONData.innerHTML)[menuDiv.classList.value];
             document.body.appendChild(menuDiv);
+
+            document.getElementById('brightness-selection')
+                .addEventListener('valuechange', function (e) {
+                    localStorage.brightness = e.detail;
+                }
+            );
+
+            document.getElementById('sound-selection')
+                .addEventListener('valuechange', function (e) {
+                    localStorage.sound = e.detail;
+                }
+            );
 
             loadTopRightMenuIcons();
 
@@ -362,7 +373,11 @@ function addTopBarMenues() {
     }
 
     rightDiv.addEventListener('mousedown', addTopRightMenu);
+}
 
+function initLocalSettings() {
+    if (!localStorage.getItem('brightness')) localStorage.setItem('brightness', '1');
+    if (!localStorage.getItem('sound')) localStorage.setItem('sound', '0.3');
 }
 
 function addCustomInputEvents() {
@@ -385,7 +400,15 @@ function addCustomInputEvents() {
 
             function moveRange(e) {
                 let offsetX = e.clientX - startX;
+                if (offsetX / width > 1) offsetX = width
+                if (offsetX < 0) offsetX = 0
                 element.parentElement.style.setProperty('--value', `${offsetX / width}`);
+                element.parentElement.setAttribute('value', `${offsetX / width}`);
+                element.parentElement.dispatchEvent(new CustomEvent('valuechange', {
+                    detail: offsetX / width,
+                    bubbles: true,
+                    composed: true
+                }));
             }
 
             function focusRange() {
@@ -458,6 +481,7 @@ async function onStart() {
 
     // Load after
     addSelectionDivInteration();
+    initLocalSettings();
     addCustomInputEvents();
 
     loadApp('browser-compatibility');

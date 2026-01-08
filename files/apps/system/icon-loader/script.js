@@ -50,8 +50,8 @@ async function loadTopRightMenuIcons() {
     let nightLight = document.getElementById('night-light-icon');
     nightLight.innerHTML = icons['top-right-menu-icons']['night-light'];
 
-    let darkStyle = document.getElementById('dark-style');
-    // darkStyle.innerHTML = icons['top-right-menu-icons']['dark-mode']; // TODO find icon
+    let darkStyle = document.getElementById('dark-style-icon');
+    darkStyle.innerHTML = icons['top-right-menu-icons']['dark-style'];
 
     let doNotDisturb = document.getElementById('do-not-disturb-icon');
     doNotDisturb.innerHTML = icons['top-right-menu-icons']['do-not-disturb'];
