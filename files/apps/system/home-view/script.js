@@ -346,6 +346,24 @@ function addTopBarMenues() {
             document.removeEventListener('mousedown', removeMenu);
         }
 
+        function changeNightLight() {
+            if (localStorage.getItem('night-light')) {
+                localStorage.removeItem('night-light');
+                document.querySelector('.load-screen').style.setProperty('--str', '0');
+                document.getElementById('menu-night-light').classList.replace('on', 'off')
+                return
+            }
+            localStorage.setItem('night-light', true);
+            let str = localStorage.getItem('night-light-strength');
+            document.querySelector('.load-screen').style.setProperty('--str', str);
+            document.getElementById('menu-night-light').classList.replace('off', 'on')
+        };
+
+        function checkData() {
+            let nightLight = document.getElementById('menu-night-light');
+            if (localStorage.getItem('night-light')) nightLight.classList.replace('off', 'on');
+        }
+
         if (document.getElementsByClassName('top-right-menu').length > 0) return;
         else {
             let menuDiv = document.createElement('div');
@@ -357,6 +375,8 @@ function addTopBarMenues() {
             document.getElementById('brightness-selection')
                 .addEventListener('valuechange', function (e) {
                     localStorage.brightness = e.detail;
+                    document.querySelector('.load-screen').style.setProperty('--opacity', (1 - e.detail) / 1.2);
+                    document.querySelector('.load-screen').style.opacity = 1;
                 }
             );
 
@@ -366,7 +386,11 @@ function addTopBarMenues() {
                 }
             );
 
+            document.getElementById('menu-night-light')
+                .addEventListener('click', changeNightLight);
+
             loadTopRightMenuIcons();
+            checkData();
 
             document.addEventListener('mousedown', removeMenu);
         }
@@ -376,7 +400,25 @@ function addTopBarMenues() {
 }
 
 function initLocalSettings() {
-    if (!localStorage.getItem('brightness')) localStorage.setItem('brightness', '1');
+
+    // Brightness
+
+    if (!localStorage.getItem('brightness')) {
+        localStorage.setItem('brightness', '1');
+    }
+
+    let loadScreen = document.querySelector('.load-screen');
+    loadScreen.classList.remove('remove');
+    loadScreen.style.setProperty('--opacity', (1 - localStorage.getItem('brightness')) / 1.2)
+    loadScreen.style.opacity = 1;
+
+    if (localStorage.getItem('night-light')) {
+        console.log('Night');
+        document.querySelector('.load-screen').style.setProperty('--str', localStorage.getItem('night-light-strength'));
+    }
+
+    // Sound
+
     if (!localStorage.getItem('sound')) localStorage.setItem('sound', '0.3');
 }
 

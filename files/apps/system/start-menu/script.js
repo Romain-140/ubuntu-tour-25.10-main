@@ -37,12 +37,12 @@ function getElementIndex(collection, element) {
 }
 
 function removeBlack() {
-    document.getElementsByClassName('load-screen').item(0).classList.add('remove');
+    document.querySelector('.load-screen').classList.add('remove');
 }
 
 function removeGrub() {
     let black = document.createElement('div');
-    black.classList = 'load-screen';
+    black.classList.add('load-screen');
     document.body.appendChild(black);
 
     document.getElementsByClassName('grub-box').item(0).remove();

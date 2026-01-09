@@ -328,7 +328,7 @@ body  {
     border-radius: 50vh 0 0 50vh;
 }
 
-.menu-brightness-icon, .menu-lock, .menu-shutdown, .menu-screenshot, .menu-settings {
+.menu-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,12 +361,21 @@ body  {
 
 /* ON / OFF */
 
+.large-menu-item {
+    transition: all .1s;
+    cursor: pointer;
+}
+
 .off.large-menu-item.single-item {
     background-color: #333;
 }
 
 .off.large-menu-item.single-item:hover {
     background-color: #383838;
+}
+
+.on.large-menu-item.single-item {
+    background-color: rgb(235, 66, 0);
 }
 
 .off .large-menu-left {
