@@ -379,6 +379,7 @@ function totalNumberOfWindows() {
 
 function createWindow(windowElement) {
     let draggableChildren = [].slice.call(windowElement.getElementsByClassName('draggable'));
+    console.log(draggableChildren);
     let windowID = totalNumberOfWindows();
 
     taskWindow(windowElement, draggableChildren, windowID);
@@ -396,9 +397,9 @@ function onStart() {
     // document.getElementById('script-window-manager').outerHTML = '';
     document.getElementById('option-2').addEventListener('click', () => {
         let window = document.createElement('div');
-        window.innerHTML = "<div id='window-test' class='window' style='position: absolute; top: 20%; left: 20%; z-index: 1' minx='200' miny='50'><div class='window-test-topbar draggable'></div></div>"
+        window.innerHTML = JSON.parse(document.getElementById('json-data').innerHTML)["window template"];
         let windowSpace = document.getElementById('window-space');
         windowSpace.appendChild(window);
-        createWindow(document.getElementById('window-test'));
+        createWindow(document.getElementById('window-start'));
     });
 }

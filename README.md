@@ -19,6 +19,10 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 * [ ] Add settings app
 * [ ] Clean up (last time I swear)
 
+## Fix (TODO)
+* [ ] Error with loading custom ranges in Chromium
+* [ ] Block out-of-bound window resize
+
 ## Info
 Created for Firefox (possible compatibility issues with others browsers)\
 Blocks the most of broswers shortcuts for a more immersive experience
