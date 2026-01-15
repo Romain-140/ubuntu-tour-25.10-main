@@ -11,7 +11,7 @@ Inspired by [malisipi](https://github.com/malisipi/ubuntu-tour)'s project, but i
 * [x] Finish window manager
 * [x] Finish browser compatibility module
 * [x] Add variable minimal window size (as an atribute)
-* [ ] Add OS tools (network, battery, sound, brightness)
+* [x] Add OS tools (network, battery, sound, brightness)
 * [ ] Clean up
 * [ ] Add notification (apps)
 * [ ] Clean up (again)

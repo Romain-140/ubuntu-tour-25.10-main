@@ -1,8 +1,6 @@
-let scene;
 let cubes;
 
 const movementSize = 50;
-
 const perspective = 800;
 
 MMultiply = (a, b) => a.map(x => transpose(b).map(y => dotProduct(x, y)));
@@ -25,7 +23,7 @@ let cosY;
 let sinX;
 let sinY;
 
-let sensitivity = 3;
+let sensitivity = (sessionStorage.browser === "Firefox") ? 3 : 1;
 
 function addStyle() {
     let style = document.createElement('link');
@@ -35,6 +33,13 @@ function addStyle() {
 }
 
 function setup() {
+
+    rX = 0;
+    rY = 0;
+
+    tX = 0;
+    tY = 0;
+    tZ = 0;
 
     scene = document.querySelector(".scene");
     cubes = document.querySelectorAll('.cube');
@@ -81,8 +86,30 @@ function setup() {
 }
 
 function loadScene(container) {
-    container.innerHTML = '<div class="scene"><div class="cube" x="0" y="100" z="0"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div><div class="cube" x="0" y="-100" z="0"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div><div class="cube" x="100" y="0" z="0"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div><div class="cube" x="-100" y="0" z="0"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div><div class="cube" x="0" y="0" z="100"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div><div class="cube" x="0" y="0" z="-100"><div class="face top"></div><div class="face bottom"></div><div class="face left"></div><div class="face right"></div><div class="face front"></div><div class="face back"></div></div></div>';
+    container.innerHTML = '<div class="scene"></div>';
 }
+
+function addCube(x, y, z, type, scene) {
+    type = type === "" ? 'noName' : type;
+    let cube = document.createElement('div');
+    cube.classList = 'cube';
+    cube.type = type;
+    cube.setAttribute('x', x);
+    cube.setAttribute('y', y);
+    cube.setAttribute('z', z);
+
+    cube.innerHTML = `
+        <div class="face top" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-top.webp)"></div>
+        <div class="face bottom" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-bot.webp)"></div>
+        <div class="face left" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-left.webp)"></div>
+        <div class="face right" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-right.webp)"></div>
+        <div class="face front" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-front.webp)"></div>
+        <div class="face back" style="background-image: url(./files/apps/custom/not-minecraft/data/img/blocks/${type}/${type}-back.webp)"></div>`;
+    scene.appendChild(cube);
+}
+
+
+
 // TODO edit with addlock function (x, y, z, type)
 // TODO add block type
 // TODO grab textures
@@ -96,9 +123,9 @@ function updateViewPoint() {
   for (let i = 0; i < cubes.length ; i++) {
     let cube = cubes[i];
 
-    let cX = Number(cube.getAttribute('x'));
-    let cY = Number(cube.getAttribute('y'));
-    let cZ = Number(cube.getAttribute('z'));
+    let cX = Number(cube.getAttribute('x')) * 100;
+    let cY = Number(cube.getAttribute('y')) * 100;
+    let cZ = Number(cube.getAttribute('z')) * 100;
 
     let coordinates = [[cX], [cY], [cZ]];
     let playerPosition = [[-tX * movementSize], [tY * movementSize], [-tZ * movementSize]];
@@ -134,8 +161,7 @@ function updateViewPoint() {
   }
 };
 
-function onStart() {
-    addStyle();
+function loadWindowNotMinecraft() {
     let JSONData = document.getElementById('json-data');
     let window = document.createElement('div');
     window.innerHTML = JSON.parse(JSONData.innerHTML)["window template"];
@@ -149,5 +175,16 @@ function onStart() {
     loadScene(content);
     window.firstChild.appendChild(content);
 
+    addCube(1, 0, 0, "", content.firstChild);
+    addCube(0, 1, 0, "", content.firstChild);
+    addCube(0, 0, 1, "", content.firstChild);
+    addCube(0, 0, 0, "grass_block", content.firstChild);
+
     setup();
+}
+
+function onStart() {
+    addStyle();
+
+    loadWindowNotMinecraft();
 }

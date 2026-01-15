@@ -46,44 +46,41 @@
   width: var(--cube-width);
   height: var(--cube-height);
   position: absolute;
+  /*overflow: hidden;*/
+}
+
+.face.top {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-height) / 2));
+}
+
+.face.bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--cube-height) / 2));
+}
+
+.face.front {
+  transform: translateZ(calc(var(--cube-depth) / 2));
+}
+
+.face.back {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-depth) / 2));
+}
+
+.face.right {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-width) / 2));
+}
+
+.face.left {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-width) / 2));
 }
 
 .face {
   position: absolute;
+  background-size: contain;
+  background-image: url(./data/img/blocks/noName/noTexture.webp);
   inset: 0;
   display: grid;
   place-items: center;
   font-weight: bold;
   backface-visibility: hidden;
   box-shadow: 0 0 1px rgba(0,0,0,0.2);
-}
-
-.face.top {
-  transform: rotateX(90deg) translateZ(calc(var(--cube-height) / 2));
-  background-color: white;
-}
-
-.face.bottom {
-    transform: rotateX(-90deg) translateZ(calc(var(--cube-height) / 2));
-  background-color: black;
-}
-
-.face.front {
-  transform: translateZ(calc(var(--cube-depth) / 2));
-  background: red;
-}
-
-.face.back {
-  transform: rotateY(180deg) translateZ(calc(var(--cube-depth) / 2));
-  background: blue;
-}
-
-.face.right {
-  transform: rotateY(90deg) translateZ(calc(var(--cube-width) / 2));
-  background: green;
-}
-
-.face.left {
-  transform: rotateY(-90deg) translateZ(calc(var(--cube-width) / 2));
-  background: yellow;
 }
