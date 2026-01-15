@@ -1,4 +1,5 @@
 let jsonContent = {
+    "data-loader": {"type": "system", "name": "data-loader"},
     "data": {"type": "system", "name": "data"},
     "icon-loader": {"type": "system", "name":"icon-loader"},
     "start-menu": {"type": "system", "name":"start-menu"},
@@ -11,3 +12,5 @@ let jsonContent = {
 };
 
 document.getElementById('apps-json').innerHTML = JSON.stringify(jsonContent);
+
+// Clean

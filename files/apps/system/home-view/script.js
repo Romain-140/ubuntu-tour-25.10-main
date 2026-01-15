@@ -185,13 +185,8 @@ function addUpdateElementsTopRight() {
                 quality = "low";
             }
 
-            let netowrkElement = document.getElementById('network');
-            netowrkElement.innerHTML = '';
-
-            let icon = document.createElement('svg');
-            icon.innerHTML = icons[quality];
-            netowrkElement.appendChild(icon);
-
+            let networkElement = document.getElementById('network');
+            networkElement.innerHTML = icons[quality];
         }, 3000);
     }
 
@@ -201,7 +196,6 @@ function addUpdateElementsTopRight() {
         setInterval(async function () {
             let batteryData = await navigator.getBattery();
             let icons = JSON.parse(JSONData.innerHTML)["battery-icons"];
-            let charging = JSON.parse(JSONData.innerHTML)["battery-icons"]["charging"];
 
 
             let batteryElement = document.getElementById('battery');
@@ -214,27 +208,21 @@ function addUpdateElementsTopRight() {
                 icons = icons['discharging'];
             }
 
+            let icon;
+
             if (batteryData.level < 0.1) {
-                let icon = document.createElement('svg');
-                icon.innerHTML = icons["empty"];
-                batteryElement.appendChild(icon);
+                icon.outerHTML = icons["empty"];
             } else if (batteryData.level < 0.3) {
-                let icon = document.createElement('svg');
-                icon.innerHTML = icons["low"];
-                batteryElement.appendChild(icon);
+                icon.outerHTML = icons["low"];
             } else if (batteryData.level < 0.5) {
-                let icon = document.createElement('svg');
-                icon.innerHTML = icons["medium"];
-                batteryElement.appendChild(icon);
+                icon.outerHTML = icons["medium"];
             } else if (batteryData.level < 0.8) {
-                let icon = document.createElement('svg');
-                icon.innerHTML = icons["high"];
-                batteryElement.appendChild(icon);
+                icon.outerHTML = icons["high"];
             } else {
-                let icon = document.createElement('svg');
-                icon.innerHTML = icons["full"];
-                batteryElement.appendChild(icon);
+                icon.outerHTML = icons["full"];
             }
+
+            batteryElement.innerHMTL = icon;
         }, 3000)
     }
 }
@@ -255,10 +243,7 @@ function addTopRightElements() {
     networkElement.id = 'network';
     networkElement.classList.add('network-display');
     networkElement.classList.add('icon');
-
-    let networkIcon = document.createElement('div');
-    networkIcon.innerHTML = JSON.parse(JSONData.innerHTML)["connection-error"];
-    networkElement.appendChild(networkIcon);
+    networkElement.innerHTML = JSON.parse(JSONData.innerHTML)["connection-error"];
 
     if (navigator.connection) localStorage.setItem('networkUpdate', true);
 
@@ -268,10 +253,8 @@ function addTopRightElements() {
     soundElement.id = 'sound';
     soundElement.classList.add('sound-display');
     soundElement.classList.add('icon');
+    soundElement.innerHTML = JSON.parse(JSONData.innerHTML)["sound-icons"]["medium"];
 
-    let soundIcon = document.createElement('svg');
-    soundIcon.innerHTML = JSON.parse(JSONData.innerHTML)["sound-icons"]["medium"];
-    soundElement.appendChild(soundIcon.children.item(0));
 
     // Battery
 
@@ -279,10 +262,7 @@ function addTopRightElements() {
     batteryElement.id = 'battery';
     batteryElement.classList.add('battery-display');
     batteryElement.classList.add('icon');
-
-    let batteryIcon = document.createElement('svg');
-    batteryIcon.innerHTML = JSON.parse(JSONData.innerHTML)["battery-error"];
-    batteryElement.appendChild(batteryIcon.children.item(0));
+    batteryElement.innerHTML = JSON.parse(JSONData.innerHTML)["battery-error"];
 
     if (navigator.userAgentData) localStorage.setItem('batteryUpdate', true);
 

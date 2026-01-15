@@ -3,7 +3,7 @@ async function detectOS() {
     let userAgent = navigator.userAgent;
     let data = navigator.userAgentData;
 
-    // Mobile OS first (more specific)
+    // Mobile OS
     if (userAgent.indexOf("iPad") > -1 || (userAgent.indexOf("Macintosh") > -1 && navigator.maxTouchPoints > 1)) {
         os = "iPadOS";
     }
@@ -15,12 +15,12 @@ async function detectOS() {
     else if (userAgent.indexOf("Macintosh") > -1) os = "macOS";
     else if (userAgent.indexOf("Linux") > -1) os = "Linux";
     
-    // Windows versions
+    // Windows Versions
     else if (userAgent.indexOf("Windows NT 6.1") > -1) os = "Windows 7";
     else if (userAgent.indexOf("Windows NT 6.2") > -1) os = "Windows 8";
     else if (userAgent.indexOf("Windows NT 6.3") > -1) os = "Windows 8.1";
     
-    // Windows 10/11 detection using High Entropy API
+    // Windows New Verions
     if (!os && data && data.getHighEntropyValues) {
         try {
             const ua = await data.getHighEntropyValues(['platformVersion']);
@@ -34,7 +34,7 @@ async function detectOS() {
         }
     }
 
-    // Fallback for Windows
+    // Wndows Fallback
     if (!os) {
         if (userAgent.indexOf("Windows NT 10.0") > -1) os = "Windows 10/11";
         else if (userAgent.includes("Win")) os = "Windows";
@@ -50,36 +50,35 @@ async function detectPlatform() {
     let os = await detectOS();
     let platform = 'Desktop';
     let browser = 'Unknown';
-    let confidence = 'high';
     
-    // Method 1: Check if mobile OS
+    // Mobile OS
     const mobileOS = ['iOS', 'iPadOS', 'Android'].includes(os);
     
-    // Method 2: Check User Agent for mobile indicators
+    // Mobile UA
     const mobileUA = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
     
-    // Method 3: Check touch capability + screen size
+    // Mobile Screen
     const hasTouchScreen = navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
     const smallScreen = window.screen.width <= 768 || window.screen.height <= 768;
     
-    // Method 4: Use User Agent Client Hints if available
+    // Mobile UAD
     let mobileFromHints = false;
     if (data && data.mobile !== undefined) {
         mobileFromHints = data.mobile;
     }
 
-    // Decision logic - prioritize multiple signals
+    // Desktop
     if (mobileOS || mobileFromHints) {
         platform = 'Mobile';
     } else if (mobileUA && hasTouchScreen && smallScreen) {
         platform = 'Mobile';
-        confidence = 'medium'; // Less certain without OS confirmation
-    } else if (mobileUA && !hasTouchScreen) {
-        platform = 'Desktop'; // Mobile UA but no touch = likely spoofed
-        confidence = 'low';
+    } else if (mobileUA && !hasTouchScreen) { // Desktop Touch Screen? 
+        platform = 'Desktop';
     } else {
         platform = 'Desktop';
     }
+
+    // // // Browser
     
     if (data && data.brands) {
         for (let brand of data.brands) {
@@ -90,9 +89,10 @@ async function detectPlatform() {
                 break;
             }
         }
-        if (browser === 'Unknown') browser = 'Chromium'; // Chromium-based fallback
+        if (browser === 'Unknown') browser = 'Chromium'; // Chromium
     }
-    // Fallback to UA string parsing
+
+    // UA Parsing
     else if (userAgent.includes('Firefox') || userAgent.includes('FxiOS')) {
         browser = 'Firefox';
     }
@@ -112,22 +112,20 @@ async function detectPlatform() {
     let language = navigator.language || navigator.userLanguage;
     let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     
-    // Try to get country from timezone (with more complete mapping)
+    // Timezone location
     let country = getCountryFromTimezone(timeZone);
     
-    // Fallback: Try to infer from language code
+    // Timezone Fallback
     if (!country && language) {
         const countryCode = language.split('-')[1];
         if (countryCode) {
             country = `Inferred: ${countryCode}`;
-            confidence = 'low';
         }
     }
     
     sessionStorage.setItem('OS', os || 'Unknown');
     sessionStorage.setItem('platform', platform);
     sessionStorage.setItem('browser', browser);
-    sessionStorage.setItem('detectionConfidence', confidence);
     
     sessionStorage.setItem('language', language);
     sessionStorage.setItem('timeZone', timeZone);
@@ -232,6 +230,12 @@ function getCountryFromTimezone(timezone) {
 async function onStart() {
     await detectPlatform();
 
+    loadAppData('browser-compatibility');
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    let data = JSON.parse(document.getElementById('browser-compatibility_data').textContent);
+
     let browser = sessionStorage.getItem('browser');
     let os = sessionStorage.getItem('OS');
 
@@ -239,9 +243,9 @@ async function onStart() {
 
     if (browser === 'Firefox') {
         callSystemNotification(
-            'Important',
-            'You are currently using Firefox, which has limited browser-system interaction API.<br/>This means some feature will not be available (battery, connection, ...).',
-            ['OK']
+            data['Firefox_intro']['title'],
+            data['Firefox_intro']['content'],
+            data['Firefox_intro']['choices']
         );
         await waitForChange("notification-choice");
     }
@@ -249,9 +253,9 @@ async function onStart() {
     if (os.includes('Windows')) {
         sessionStorage.setItem('notification-choice', '');
         callSystemNotification(
-            'Welcome!',
-            'Welcome to Ubuntu, dear Windows user!',
-            ['Hi!']
+            data['Windows_intro']['title'],
+            data['Windows_intro']['content'],
+            data['Windows_intro']['choices']
         );
         await waitForChange("notification-choice");
     }
@@ -259,21 +263,20 @@ async function onStart() {
     if (sessionStorage.getItem('platform') === 'Mobile') {
         sessionStorage.setItem('notification-choice', '');
         callSystemNotification(
-            'Warning',
-            "You're playing a dangerous game.<br/>This project was not made for mobile, so be careful.",
-            ['OK']
+            data['Mobile_intro']['title'],
+            data['Mobile_intro']['content'],
+            data['Mobile_intro']['choices']
         );
         await waitForChange("notification-choice");
     }
 
     callSystemNotification(
-        'Information',
-        "Welcome to this online Ubuntu 25.10!<br/>As this is only a web version, some (most) features aren't available (yet).<br/>If you discover any bug, please report it on my GitHub page.<br/>Thank you!",
-        ['OK']
+        data['Generic_intro']['title'],
+        data['Generic_intro']['content'],
+        data['Generic_intro']['choices']
     )
-    
 
-    const scriptEl = document.getElementById('script-browser-compatibility');
-
-    if (scriptEl) scriptEl.remove();
+    document.getElementById('script-browser-compatibility').remove();
 }
+
+// Clean
