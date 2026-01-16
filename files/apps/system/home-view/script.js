@@ -197,32 +197,30 @@ function addUpdateElementsTopRight() {
             let batteryData = await navigator.getBattery();
             let icons = JSON.parse(JSONData.innerHTML)["battery-icons"];
 
-
-            let batteryElement = document.getElementById('battery');
-
-            batteryElement.innerHTML = '';
+            let status;
 
             if (batteryData.charging)  {
-                icons = icons['charging'];
+                status = 'charging';
             } else {
-                icons = icons['discharging'];
+                status = 'discharging';
             }
 
-            let icon;
+            let quality;
 
             if (batteryData.level < 0.1) {
-                icon.outerHTML = icons["empty"];
+                quality = "empty";
             } else if (batteryData.level < 0.3) {
-                icon.outerHTML = icons["low"];
+                quality = "low";
             } else if (batteryData.level < 0.5) {
-                icon.outerHTML = icons["medium"];
+                quality = "medium";
             } else if (batteryData.level < 0.8) {
-                icon.outerHTML = icons["high"];
+                quality = "high";
             } else {
-                icon.outerHTML = icons["full"];
+                quality = "full";
             }
 
-            batteryElement.innerHMTL = icon;
+            let batteryElement = document.querySelector('#battery');
+            batteryElement.innerHTML = icons[status][quality];
         }, 3000)
     }
 }
@@ -333,6 +331,7 @@ function addTopBarMenues() {
                 document.getElementById('menu-night-light').classList.replace('on', 'off')
                 return
             }
+
             localStorage.setItem('night-light', true);
             let str = localStorage.getItem('night-light-strength');
             document.querySelector('.load-screen').style.setProperty('--str', str);
@@ -345,6 +344,7 @@ function addTopBarMenues() {
         }
 
         if (document.getElementsByClassName('top-right-menu').length > 0) return;
+
         else {
             let menuDiv = document.createElement('div');
             menuDiv.classList.add('top-right-menu');
@@ -404,6 +404,8 @@ function initLocalSettings() {
 
 function addCustomInputEvents() {
 
+    initLocalSettings();
+
     function checkRangeInputs() {
 
         function setupElement(e) {
@@ -453,7 +455,6 @@ function addCustomInputEvents() {
             element.firstChild.addEventListener('mousedown', setupElement);
         }
     }
-
     
 
     setInterval(checkRangeInputs, 100);
@@ -503,10 +504,11 @@ async function onStart() {
 
     // Load after
     addSelectionDivInteration();
-    initLocalSettings();
     addCustomInputEvents();
 
     loadApp('browser-compatibility');
 
     document.getElementById('script-home-view').outerHTML = '';
 }
+
+// Clean

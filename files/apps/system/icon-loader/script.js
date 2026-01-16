@@ -5,39 +5,64 @@ async function loadTopRightMenuIcons() {
 
     // // First line
 
-    let battery = document.getElementById('menu-battery');
-    let _icons = icons["battery-icons"];
+    // Battery
 
-    if (!navigator.userAgentData) {
-        battery.innerHTML = icons["battery-error"];
-    } else {
-        let batteryInfo = await navigator.getBattery();
-        if (batteryInfo.charging) _icons = _icons['charging']
-        else _icons = _icons['discharging']
+    async function setBatteryIcon() {
+        let battery = document.getElementById('menu-battery');
+        let _icons = icons["battery-icons"];
 
-        if (batteryInfo.level < 0.1) battery.innerHTML = _icons['empty'];
-        else if (batteryInfo.level < 0.3) battery.innerHTML = _icons['low'];
-        else if (batteryInfo.level < 0.5) battery.innerHTML = _icons['medium'];
-        else if (batteryInfo.level < 0.8) battery.innerHTML = _icons['high'];
-        else _battery.innerHTML = icons['full'];
+        if (!navigator.userAgentData) {
+            battery.innerHTML = icons["battery-error"];
+        } else {
+            let batteryInfo = await navigator.getBattery();
+            if (batteryInfo.charging) _icons = _icons['charging']
+            else _icons = _icons['discharging']
+
+            if (batteryInfo.level < 0.1) battery.innerHTML = _icons['empty'];
+            else if (batteryInfo.level < 0.3) battery.innerHTML = _icons['low'];
+            else if (batteryInfo.level < 0.5) battery.innerHTML = _icons['medium'];
+            else if (batteryInfo.level < 0.8) battery.innerHTML = _icons['high'];
+            else battery.innerHTML = icons['full'];
+        }
     }
+
+    setInterval(setBatteryIcon, 3000);
+
+    // Screenshot
 
     let screenshot = document.getElementById('menu-screenshot');
     screenshot.innerHTML = icons['top-right-menu-icons']['screenshot'];
 
+    // Settings
+
     let settings = document.getElementById('menu-settings');
     settings.innerHTML = icons['top-right-menu-icons']['settings'];
 
+    // Lock Screen
+
     let lock = document.getElementById('menu-lock');
     lock.innerHTML = icons['top-right-menu-icons']['lock'];
+
+    // Shutdown
 
     let shutdown = document.getElementById('menu-shutdown');
     shutdown.innerHTML = icons['top-right-menu-icons']['shutdown'];
 
     // // Ranges
 
-    let sound = document.getElementById('menu-sound-icon');
-    // TODO: adaptive
+    // Sound
+
+    function setSoundIcon() {
+        let sound = document.getElementById('menu-sound-icon');
+        if (localStorage.getItem('sound') === 0) sound.innerHTML = icons['sound']['mute'];
+        else if (localStorage.getItem('sound') <= 0.33) sound.innerHTML = icons['sound']['low'];
+        else if (localStorage.getItem('sound') <= 0.66) sound.innerHTML = icons['sound']['medium'];
+        else sound.innerHTML = icons['sound']['high']
+    }
+
+    setInterval(setSoundIcon, 3000);
+
+    // Brightness
 
     let brightness = document.getElementById('menu-brightness-icon');
     brightness.innerHTML = icons['top-right-menu-icons']['brightness'];
@@ -45,7 +70,7 @@ async function loadTopRightMenuIcons() {
     // // Large Items
 
     let performance = document.getElementById('performance-icon');
-    performance.innerHTML = icons['top-right-menu-icons']['performances']['balanced']; // TODO: adaptive
+    performance.innerHTML = icons['top-right-menu-icons']['performances']['balanced']; // TODO adaptive
 
     let nightLight = document.getElementById('night-light-icon');
     nightLight.innerHTML = icons['top-right-menu-icons']['night-light'];
@@ -63,5 +88,4 @@ function onStart() {
     return;
 }
 
-// Will load all need icons
-// Crete a function for each element to load
+// Clean
