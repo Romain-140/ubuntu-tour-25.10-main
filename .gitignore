@@ -5,5 +5,5 @@ index.html
 window-template.html
 files/**/location
 files/**/custom
-.gitignore
+Note*
 test*.*
