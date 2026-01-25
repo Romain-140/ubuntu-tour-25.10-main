@@ -26,7 +26,11 @@ async function loadTopRightMenuIcons() {
         }
     }
 
-    setInterval(setBatteryIcon, 3000);
+    if (localStorage.getItem('batteryUpdate')) {
+        document.getElementById('menu-battery').innerHTML = icons["battery-error"];
+        setInterval(setBatteryIcon, 3000);
+    }
+    else document.getElementById('menu-battery').innerHTML = icons["battery-error"];
 
     // Screenshot
 
@@ -54,12 +58,13 @@ async function loadTopRightMenuIcons() {
 
     function setSoundIcon() {
         let sound = document.getElementById('menu-sound-icon');
-        if (localStorage.getItem('sound') === 0) sound.innerHTML = icons['sound']['mute'];
-        else if (localStorage.getItem('sound') <= 0.33) sound.innerHTML = icons['sound']['low'];
-        else if (localStorage.getItem('sound') <= 0.66) sound.innerHTML = icons['sound']['medium'];
-        else sound.innerHTML = icons['sound']['high']
+        if (localStorage.getItem('sound') === 0) sound.innerHTML = icons['sound-icons']['mute'];
+        else if (localStorage.getItem('sound') <= 0.33) sound.innerHTML = icons['sound-icons']['low'];
+        else if (localStorage.getItem('sound') <= 0.66) sound.innerHTML = icons['sound-icons']['medium'];
+        else sound.innerHTML = icons['sound-icons']['high']
     }
-
+    
+    setSoundIcon();
     setInterval(setSoundIcon, 3000);
 
     // Brightness

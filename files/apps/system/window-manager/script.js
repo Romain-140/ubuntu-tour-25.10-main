@@ -1,388 +1,408 @@
-// Move windows
+const topBarHeight = 31;
+const maxWindowsNumber = 997;
+let takenWindowsID = [];
+let windowsList = [];
 
-function taskWindow(windowElement, draggableChildren, idNumber) {
-    windowElement.id = `window-${idNumber}`;
-    setToFirstPlan(windowElement);
-    addResizeDiv(windowElement);
+class CustomWindow {
+    #cursorTypeElement;
+    #draggableChildren = []
+    mouseDownX = 0;
+    mouseDownY = 0;
 
-    let offsetX = 0,
-        offsetY = 0,
-        mouseX = 0,
-        mouseY = 0;
+    offsetX = 0;
+    offsetY = 0;
 
-    let event;
+    constructor(appName, resizable = true, posX = 100, posY = 100, width = 400, height = 400, minWidth = 50, minHeight = 50) {
+        this.name = appName;
 
-    function isDraggableChild(target) {
-        return draggableChildren.includes(target);
+        this.resize = resizable;
+
+        this.x = posX;
+        this.y = posY;
+
+        this.width = width;
+        this.height = height;
+
+        this.minWidth = minWidth;
+        this.minHeight = minHeight;
+
+        this.resizable = resizable;
+        this.fullscreen = false;
+
+        this.id = this.#getLowestWindowID();
+
+        this.mainElement = this.#createMainElement();
+        this.closeEvent = new CustomEvent('windowClosed', {
+                details: {
+                    id : this.id,
+                    appName: this.name
+                }
+            }
+        )
+
+        this.#initCursorType();
+
+        this.#setToFirstPlan();
+        this.#createWindowTopBar();
+        this.resizeElement = this.resizable ? this.#addResizeElement() : null;
+
+        this.mainElement.addEventListener('mousedown', this.#clickHandeler);
+
+        windowsList.push(this);
     }
 
-    windowElement.onmousedown = function(e) {
-        e.preventDefault();
+    #getLowestWindowID() {
+        let i = 0;
 
-        setToFirstPlan(windowElement);
+        while (takenWindowsID.includes(i)) i++
 
-        if (e.button === 2) {
-            openWindowContextMenu(e);
-            return;
-        }
+        console.log(i);
 
-        if (!isDraggableChild(e.target)) return;
-        if (windowElement.classList.contains('fullscreen')) return;
-
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        offsetX = mouseX - windowElement.offsetLeft;
-        offsetY = mouseY - windowElement.offsetTop;
-
-        document.onmousemove = moveWindow;
-        document.onmouseup = stopDragging;
-    };
-
-    function openWindowContextMenu(e) {
-        let jsonInfo = document.getElementById('json-data');
-
-        if (document.getElementById(`window-${idNumber}-menu`)) return;
-
-        const menu = document.createElement('div');
-        menu.id = `window-${idNumber}-menu`;
-        menu.classList.add('custom-menu');
-        menu.style.display = 'block';
-        menu.innerHTML = JSON.parse(jsonInfo.innerHTML)[e.target.classList.value];
-
-        if (menu.innerHTML === 'undefined') return;
-
-        windowElement.parentElement.appendChild(menu);
-
-        let width = menu.getBoundingClientRect().width,
-            height = menu.getBoundingClientRect().height;
-
-        // Prevent screen overflow
-
-        if (e.clientY + height >= window.innerHeight - 31) {
-            menu.style.top = `${(e.clientY - 31 - height) / (window.innerHeight - 31) * 100}%`;
-        } else {
-            menu.style.top = `${(e.clientY - 31) / (window.innerHeight - 31) * 100}%`;
-        }
-
-        if (e.clientX + width >= window.innerWidth) {
-            menu.style.left = `${(e.clientX - width) / window.innerWidth * 100}%`;
-        } else {
-            menu.style.left = `${e.clientX / window.innerWidth * 100}%`;
-        }
-
-        if (e.target.classList.value === "window-test-topbar draggable") addContextMenuFunctions(menu);
-
-        event = e;
-
-        document.addEventListener('mousedown', closeWindowContextMenu);
-    };
-
-    function closeWindowContextMenu(e) {
-        if (event === e) return;
-        event = e;
-        document.getElementById(`window-${idNumber}-menu`).classList.add('disappear');
-        setTimeout(function() {
-            document.removeEventListener('mousedown', closeWindowContextMenu);
-            document.getElementById(`window-${idNumber}-menu`).remove();
-        }, 75)
+        return i;
     }
 
-    function addContextMenuFunctions(menu) {
-        document.getElementById('window-fullscreen').addEventListener('mousedown', (e) => {
-            if (e.buttons !== 1) {event = e; return}
-            fullScreen(windowElement);
-        });
-        document.getElementById('window-close').addEventListener('mousedown', (e) => {
-            if (e.buttons !== 1) {event = e; return}
-            closeWindow(windowElement);
-        });
+    #createMainElement() {
+        let element = document.createElement('div');
+
+        element.classList.add('window');
+
+        element.setAttribute('minx', this.minWidth);
+        element.setAttribute('miny', this.minHeight);
+
+        element.style = `position: absolute; top: ${this.x}px; left: ${this.y}px; width: ${this.width}px; height: ${this.height}px`;
+
+        return element;
     }
 
-    function moveWindow(e) {
-        e.preventDefault();
+    #createWindowTopBar() {
+        let topBarMenu = document.createElement('div');
 
-        let newMouseX = e.clientX;
-        let newMouseY = e.clientY;
+        topBarMenu.classList.add('window-test-topbar');
+        topBarMenu.classList.add('draggable');
 
-        let newLeft = newMouseX - offsetX;
-        let newTop = newMouseY - offsetY;
+        this.#draggableChildren.push(topBarMenu);
+        this.mainElement.appendChild(topBarMenu);
 
-        // Prevent overflow
-
-        if (newTop <= 0) {
-            newTop = 1;
-        } else if (newTop > window.innerHeight - 100) {
-            newTop = window.innerHeight - 100;
-        }
-
-        if (newLeft < 100 - windowElement.getBoundingClientRect().width) {
-            newLeft = 100 - windowElement.getBoundingClientRect().width;
-        } else if (newLeft > window.innerWidth - 100) {
-            newLeft = window.innerWidth - 100;
-        }
-
-        windowElement.style.left = 100 * newLeft / window.innerWidth + '%';
-        windowElement.style.top = 100 * newTop / (window.innerHeight - 31) + '%';
+        return;
     }
 
-    function stopDragging() {
+    #setToFirstPlan() {
+        let windows = document.querySelectorAll('.window');
+
+        for (let window = 0; window < windows.length; window++) {
+            windows[window].style.zIndex = maxWindowsNumber - window;
+        }
+
+        this.mainElement.style.zIndex = maxWindowsNumber;
+
+        return;
+    }
+
+    #initCursorType() {
+        let cursorStyle = document.createElement('style');
+        cursorStyle.id = "resize-cursor-style";
+        document.head.appendChild(cursorStyle);
+
+        this.#cursorTypeElement = cursorStyle;
+
+        return;
+    }
+
+    #setCursorType(type) {
+        this.#cursorTypeElement.innerHTML = `*{cursor: ${type} !important}`;
+
+        return;
+    }
+
+    #clickHandeler = (e) => {
+        if (e.buttons === 1) { // Left click
+            if (this.#draggableChildren.includes(e.target) && !this.fullscreen) {
+                this.mouseDownX = e.x;
+                this.mouseDownY = e.y;
+
+                this.#setCursorType('default');
+
+                document.onmousemove = this.#moveWindow;
+                document.onmouseup = this.#stopMoveWindow;
+            }
+        }
+    }
+
+    #resizeWindow(e, direction) {
+        function resizeLeft(event) {
+            this.offsetX = event.x - this.mouseDownX;
+            let newWidth = this.width - this.offsetX;
+
+            if (this.x + this.offsetX < 0) this.offsetX = -this.x
+            if (newWidth < this.minWidth) this.offsetX = this.width - this.minWidth
+
+            this.mainElement.style.width = `${this.width - this.offsetX}px`;
+            this.mainElement.style.left = `${this.x + this.offsetX}px`;
+        }
+
+        function resizeRight(event) {
+            this.offsetX = event.x - this.mouseDownX;
+            let newWidth = this.width + this.offsetX;
+
+            if (newWidth + this.x > window.innerWidth) this.offsetX = window.innerWidth - this.x - this.width
+            if (newWidth < this.minWidth) this.offsetX = this.minWidth - this.width
+
+            this.mainElement.style.width = `${this.width + this.offsetX}px`;
+        }
+
+        function resizeTop(event) {
+            this.offsetY = event.y - this.mouseDownY;
+            let newHeight = this.height - this.offsetY;
+
+            if (this.y + this.offsetY < 0) this.offsetY = -this.y
+            if (newHeight < this.minHeight) this.offsetY = this.height - this.minHeight
+
+            this.mainElement.style.height = `${this.height - this.offsetY}px`;
+            this.mainElement.style.top = `${this.y + this.offsetY}px`;
+        }
+
+        function resizeBottom(event) {
+            this.offsetY = event.y - this.mouseDownY;
+            let newHeight = this.height + this.offsetY;
+
+            if (newHeight + this.y > window.innerHeight - topBarHeight) this.offsetY = window.innerHeight - this.y - this.height - topBarHeight
+            if (newHeight < this.minHeight) this.offsetY = this.minHeight - this.height
+
+            this.mainElement.style.height = `${this.height + this.offsetY}px`;
+        }
+
+        if (direction === 'L') {
+            this.#setCursorType('ew-resize');
+            document.onmousemove = resizeLeft.bind(this);
+
+        } else if (direction === 'R') {
+            this.#setCursorType('ew-resize');
+            document.onmousemove = resizeRight.bind(this);
+
+        } else if (direction === 'T') {
+            this.#setCursorType('ns-resize');
+            document.onmousemove = resizeTop.bind(this);
+
+        } else if (direction === 'B') {
+            this.#setCursorType('ns-resize');
+            document.onmousemove = resizeBottom.bind(this);
+
+        } else if (direction === 'TL') {
+            this.#setCursorType('nwse-resize');
+            document.onmousemove = (e) => {
+                resizeTop.bind(this)(e);
+                resizeLeft.bind(this)(e);
+            }
+        } else if (direction === 'TR') {
+            this.#setCursorType('nesw-resize');
+            document.onmousemove = (e) => {
+                resizeTop.bind(this)(e);
+                resizeRight.bind(this)(e);
+            }
+        } else if (direction === 'BL') {
+            this.#setCursorType('nesw-resize');
+            document.onmousemove = (e) => {
+                resizeBottom.bind(this)(e);
+                resizeLeft.bind(this)(e);
+            }
+        } else if (direction === 'BR') {
+            this.#setCursorType('nwse-resize');
+            document.onmousemove = (e) => {
+                resizeBottom.bind(this)(e);
+                resizeRight.bind(this)(e);
+            }
+        }
+
+        document.onmouseup = () => {
+            if (direction === 'L') {
+                this.width -= this.offsetX;
+                this.x += this.offsetX;
+
+            } else if (direction === 'T') {
+                this.height -= this.offsetY;
+                this.y += this.offsetY;
+
+            } else if (direction === 'R') {
+                this.width += this.offsetX;
+
+            } else if (direction === 'B') {
+                this.height += this.offsetY;
+
+            } else if (direction === 'TL') {
+                this.width -= this.offsetX;
+                this.height -= this.offsetY;
+
+                this.x += this.offsetX;
+                this.y += this.offsetY;
+
+            } else if (direction === 'TR') {
+                this.width += this.offsetX;
+                this.height -= this.offsetY;
+
+                this.y += this.offsetY;
+
+            } else if (direction === 'BL') {
+                this.width -= this.offsetX;
+                this.height += this.offsetY;
+
+                this.x += this.offsetX;
+
+            } else if (direction === 'BR') {
+                this.width += this.offsetX;
+                this.height += this.offsetY;
+
+            }
+
+            this.#setCursorType('');
+
+            document.onmousemove = null;
+            document.onmouseup = null;
+        }
+
+        return;
+    }
+
+    #addResizeElement() {
+        let resizeParent = document.createElement('div');
+        resizeParent.classList.add('resize-parent');
+
+        let resizeDivs = [
+            ['left', 'L'],
+            ['right', 'R'],
+            ['top', 'T'],
+            ['bottom', 'B'],
+            ['top-left', 'TL'],
+            ['top-right', 'TR'],
+            ['bottom-left', 'BL'],
+            ['bottom-right', 'BR']
+        ];
+
+        for (let id = 0; id < resizeDivs.length; id++) {
+            let resize = document.createElement('div');
+
+            resize.classList.add('resize');
+            resize.classList.add(resizeDivs[id][0]);
+
+            resize.addEventListener('mousedown', (e) => {
+                if (e.buttons !== 1) return
+
+                this.mouseDownX = e.x;
+                this.mouseDownY = e.y;
+                this.#resizeWindow(e, resizeDivs[id][1]);
+            });
+
+            resizeParent.appendChild(resize);
+        }
+
+        this.mainElement.appendChild(resizeParent);
+
+        return resizeParent;
+    }
+
+    #updateTransform() {
+        this.mainElement.style.left = `${this.x}px`;
+        this.mainElement.style.top = `${this.y}px`;
+        
+
+        this.mainElement.style.width = `${this.width}px`;
+        this.mainElement.style.height = `${this.height}px`;
+
+        return;
+    }
+
+    #moveWindow = (e) => {
+        this.offsetX = e.x - this.mouseDownX;
+        this.offsetY = e.y - this.mouseDownY;
+
+        let newX = this.x + this.offsetX;
+        let newY = this.y + this.offsetY;
+
+        if (newX > window.innerWidth - 100) newX = window.innerWidth - 100
+        else if (newX < 100 - this.width) newX = 100 - this.width;
+
+        if (newY > window.innerHeight - 70) newY = window.innerHeight - 70
+        else if (newY < 0) newY = 0
+
+        this.mainElement.style.left = `${newX}px`;
+        this.mainElement.style.top = `${newY}px`;
+        
+        return;
+    }
+
+    #stopMoveWindow = (e) => {
+        this.x += this.offsetX;
+        this.y += this.offsetY;
+
+        this.#setCursorType('');
+
         document.onmousemove = null;
         document.onmouseup = null;
+        
+        return;
     }
 
-    function closeWindow(windowElement) {
-        windowElement.classList.add('remove');
-        setTimeout(() => {windowElement.parentElement.remove()}, 150)
-    }
-}
+    addToDesktop() {
+        let windowSpace = document.getElementById('window-space');
+        windowSpace.appendChild(this.mainElement);
 
-function resizewindow(event, windowElement, direction) {
-    if (event.buttons !== 1) return;
-
-    const minXSize = Number(windowElement.getAttribute('minx')) || 100;
-    const minYSize = Number(windowElement.getAttribute('miny')) || 100;
-
-    let startX = windowElement.getBoundingClientRect().left,
-        startY = windowElement.getBoundingClientRect().top - 31;
-
-    let startWidth = windowElement.getBoundingClientRect().width,
-        startHeight = windowElement.getBoundingClientRect().height;
-
-    let mouseX = event.clientX,
-        mouseY = event.clientY;
-
-    function removeEvents() {
-        document.getElementById('resize-cursor-style').remove();
-        document.removeEventListener('mouseup', removeEvents);
-
-        document.removeEventListener('mousemove', resizeLeft);
-        document.removeEventListener('mousemove', resizeRight);
-        document.removeEventListener('mousemove', resizeTop);
-        document.removeEventListener('mousemove', resizeBottom);
+        return;
     }
 
-    function resizeLeft(event) {
-        let offset = event.clientX - mouseX;
-        let newWidth = startWidth - offset;
+    forceTransformWindow(width, height, x, y, transition = true, time = 0.15) {
+        this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
-        if (newWidth < minXSize) {
-            offset = startWidth - minXSize;
+        this.width = width;
+        this.height = height;
+
+        this.x = x;
+        this.y = y;
+
+        this.#updateTransform();
+
+        setTimeout(() => {this.mainElement.style.transition = ''}, time * 1200);
+
+        return;
+    }
+
+    forceFullscreen(transition  = true, time = 0.15) {
+        this.mainElement.style.transition = transition ? `all ${time}s` : '';
+
+        this.fullscreen = true;
+        this.mainElement.classList.add('fullscreen');
+
+        if (this.resizable) {
+            this.resizeElement.remove();
+            this.resizeElement = null;
         }
+        
+        setTimeout(() => {this.mainElement.style.transition = ''}, time * 1200);
 
-        windowElement.style.width = `${(startWidth - offset) / window.innerWidth * 100}%`;
-        windowElement.style.left = `${(startX + offset) / window.innerWidth * 100}%`;
+        return;
     }
 
-    function resizeRight(event) {
-        let offset = event.clientX - mouseX;
-        let newWidth = startWidth + offset;
+    removeFullscreen(transition = true, time = 0.15) {
+        this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
-        if (newWidth < minXSize) {
-            offset = minXSize - startWidth;
-        }
+        this.fullscreen = false;
+        this.mainElement.classList.remove('fullscreen');
 
-        windowElement.style.width = `${(startWidth + offset) / window.innerWidth * 100}%`;
+        if (this.resizable) this.resizeElement = this.#addResizeElement()
+
+        setTimeout(() => {this.mainElement.style.transition = ''}, time * 1200);
+
+        return;
     }
 
-    function resizeTop(event) {
-        let offset = event.clientY - mouseY;
+    close(silent = false) {
+        if (!silent) this.mainElement.dispatchEvent(this.closeEvent);
+        this.mainElement.classList.add('remove');
 
-        if (event.clientY < 32) {
-            offset = 32 - mouseY;
-        }
+        windowsList.remove(this);
 
-        let newHeight = startHeight - offset;
+        setTimeout(() => {this.mainElement.remove()}, 100);
 
-        if (newHeight < minYSize) {
-            offset = startHeight - minYSize;
-        }
-
-        windowElement.style.height = `${(startHeight - offset) / (window.innerHeight - 31) * 100}%`;
-        windowElement.style.top = `${(startY + offset) / (window.innerHeight - 31) * 100}%`;
+        return;
     }
-
-    function resizeBottom(event) {
-        let offset = event.clientY - mouseY;
-        let newHeight = startHeight + offset;
-
-        if (newHeight < minYSize) {
-            offset = minYSize - startHeight;
-        }
-
-        windowElement.style.height = `${(startHeight + offset) / (window.innerHeight - 31) * 100}%`;
-    }
-
-    let cursorStyle = document.createElement('style');
-    cursorStyle.id = "resize-cursor-style";
-    document.head.appendChild(cursorStyle);
-
-    if (direction === 'L') {
-        cursorStyle.innerHTML = "*{cursor: ew-resize !important}";
-        document.addEventListener('mousemove', resizeLeft);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'R') {
-        cursorStyle.innerHTML = "*{cursor: ew-resize !important}";
-        document.addEventListener('mousemove', resizeRight);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'T') {
-        cursorStyle.innerHTML = "*{cursor: ns-resize !important}";
-        document.addEventListener('mousemove', resizeTop);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'B') {
-        cursorStyle.innerHTML = "*{cursor: ns-resize !important}";
-        document.addEventListener('mousemove', resizeBottom);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'TL') {
-        cursorStyle.innerHTML = "*{cursor: nwse-resize !important}";
-        document.addEventListener('mousemove', resizeTop);
-        document.addEventListener('mousemove', resizeLeft);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'TR') {
-        cursorStyle.innerHTML = "*{cursor: nesw-resize !important}";
-        document.addEventListener('mousemove', resizeTop);
-        document.addEventListener('mousemove', resizeRight);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'BL') {
-        cursorStyle.innerHTML = "*{cursor: nesw-resize !important}";
-        document.addEventListener('mousemove', resizeBottom);
-        document.addEventListener('mousemove', resizeLeft);
-        document.addEventListener('mouseup', removeEvents);
-    } else if (direction === 'BR') {
-        cursorStyle.innerHTML = "*{cursor: nwse-resize !important}";
-        document.addEventListener('mousemove', resizeBottom);
-        document.addEventListener('mousemove', resizeRight);
-        document.addEventListener('mouseup', removeEvents);
-    }
-}
-
-function addResizeDiv(windowElement) {
-    let resizeParent = document.createElement('div');
-    resizeParent.classList.add('resize-parent');
-
-    // L
-    
-    let resizeL = document.createElement('div');
-    resizeL.classList.add('resize');
-    resizeL.classList.add('left');
-    resizeL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'L')});
-
-    // R
-
-    let resizeR = document.createElement('div');
-    resizeR.classList.add('resize');
-    resizeR.classList.add('right');
-    resizeR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'R')});
-
-    // T
-
-    let resizeT = document.createElement('div');
-    resizeT.classList.add('resize');
-    resizeT.classList.add('top');
-    resizeT.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'T')});
-
-    // B
-
-    let resizeB = document.createElement('div');
-    resizeB.classList.add('resize');
-    resizeB.classList.add('bottom');
-    resizeB.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'B')});
-
-    // TL
-
-    let resizeTL = document.createElement('div');
-    resizeTL.classList.add('resize');
-    resizeTL.classList.add('top-left');
-    resizeTL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'TL')});
-
-    // TR
-
-    let resizeTR = document.createElement('div');
-    resizeTR.classList.add('resize');
-    resizeTR.classList.add('top-right');
-    resizeTR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'TR')});
-
-    // BL
-
-    let resizeBL = document.createElement('div');
-    resizeBL.classList.add('resize');
-    resizeBL.classList.add('bottom-left');
-    resizeBL.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'BL')});
-
-    // BR
-
-    let resizeBR = document.createElement('div');
-    resizeBR.classList.add('resize');
-    resizeBR.classList.add('bottom-right');
-    resizeBR.addEventListener('mousedown', function(e) {resizewindow(e, windowElement, 'BR')});
-
-    // Parent
-
-    resizeParent.appendChild(resizeR);
-    resizeParent.appendChild(resizeL);
-    resizeParent.appendChild(resizeT);
-    resizeParent.appendChild(resizeB);
-
-    resizeParent.appendChild(resizeTL);
-    resizeParent.appendChild(resizeTR);
-    resizeParent.appendChild(resizeBL);
-    resizeParent.appendChild(resizeBR);
-
-    windowElement.appendChild(resizeParent);
-}
-
-function removeFullscreen(windowElement) {
-    windowElement.classList.remove('fullscreen');
-    setTimeout(() => {windowElement.style.transition = ''}, 300);
-    addResizeDiv(windowElement);
-}
-
-function fullScreen(windowElement) {
-    if (windowElement.classList.value.includes('fullscreen')) {
-        removeFullscreen(windowElement);
-        return
-    }
-
-    windowElement.style.transition = 'all .25s';
-    windowElement.classList.add('fullscreen');
-    windowElement.getElementsByClassName('resize-parent')[0].remove();
-}
-
-function setToFirstPlan(currentWindow) {
-    let windows = document.getElementsByClassName('window');
-    let forward_ = false;
-
-    for (let windowElement of windows) {
-        if (windowElement.style.zIndex >= currentWindow.style.zIndex && windowElement !== currentWindow) {
-            windowElement.style.zIndex -= 1;
-            forward_ = true;
-        }
-    }
-
-    if (forward_) currentWindow.style.zIndex = 997;
-}
-
-
-// Open Window
-
-function numberOfWindows(className) {
-    let windows = document.getElementsByClassName(className);
-
-    return windows.length;
-}
-
-function totalNumberOfWindows() {
-    let windows = document.getElementsByClassName('window');
-
-    return windows.length;
-}
-
-function createWindow(windowElement) {
-    let draggableChildren = [].slice.call(windowElement.getElementsByClassName('draggable'));
-    console.log(draggableChildren);
-    let windowID = totalNumberOfWindows();
-
-    taskWindow(windowElement, draggableChildren, windowID);
 }
 
 function loadStyle() {
@@ -394,12 +414,9 @@ function loadStyle() {
 
 function onStart() {
     loadStyle();
-    // document.getElementById('script-window-manager').outerHTML = '';
+
     document.getElementById('option-2').addEventListener('click', () => {
-        let window = document.createElement('div');
-        window.innerHTML = JSON.parse(document.getElementById('json-data').innerHTML)["window template"];
-        let windowSpace = document.getElementById('window-space');
-        windowSpace.appendChild(window);
-        createWindow(document.getElementById('window-start'));
+        let windowTest = new CustomWindow('Test');
+        windowTest.addToDesktop();
     });
 }

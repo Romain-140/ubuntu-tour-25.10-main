@@ -8,7 +8,7 @@ let jsonContent = {
     "browser-compatibility": {"type": "system", "name": "browser-compatibility"},
     "window-manager": {"type": "system", "name": "window-manager"},
     "notification-manager": {"type": "system", "name": "notification-manager"},
-    "not-minecraft": {"type": "custom", "name": "not-minecraft"}
+    "ucraft": {"type": "custom", "name": "ucraft"}
 };
 
 document.getElementById('apps-json').innerHTML = JSON.stringify(jsonContent);
