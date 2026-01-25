@@ -12,6 +12,9 @@ class CustomWindow {
     offsetX = 0;
     offsetY = 0;
 
+    newX = 0;
+    newY = 0;
+
     constructor(appName, resizable = true, posX = 100, posY = 100, width = 400, height = 400, minWidth = 50, minHeight = 50) {
         this.name = appName;
 
@@ -55,8 +58,6 @@ class CustomWindow {
         let i = 0;
 
         while (takenWindowsID.includes(i)) i++
-
-        console.log(i);
 
         return i;
     }
@@ -115,6 +116,8 @@ class CustomWindow {
     }
 
     #clickHandeler = (e) => {
+        this.#setToFirstPlan();
+
         if (e.buttons === 1) { // Left click
             if (this.#draggableChildren.includes(e.target) && !this.fullscreen) {
                 this.mouseDownX = e.x;
@@ -214,6 +217,11 @@ class CustomWindow {
         }
 
         document.onmouseup = () => {
+            this.#setCursorType('');
+
+            document.onmousemove = null;
+            document.onmouseup = null;
+
             if (direction === 'L') {
                 this.width -= this.offsetX;
                 this.x += this.offsetX;
@@ -253,10 +261,7 @@ class CustomWindow {
 
             }
 
-            this.#setCursorType('');
-
-            document.onmousemove = null;
-            document.onmouseup = null;
+            this.#updateTransform();
         }
 
         return;
@@ -284,10 +289,11 @@ class CustomWindow {
             resize.classList.add(resizeDivs[id][0]);
 
             resize.addEventListener('mousedown', (e) => {
-                if (e.buttons !== 1) return
+                if (e.buttons !== 1) return;
 
                 this.mouseDownX = e.x;
                 this.mouseDownY = e.y;
+
                 this.#resizeWindow(e, resizeDivs[id][1]);
             });
 
@@ -303,9 +309,15 @@ class CustomWindow {
         this.mainElement.style.left = `${this.x}px`;
         this.mainElement.style.top = `${this.y}px`;
         
-
         this.mainElement.style.width = `${this.width}px`;
         this.mainElement.style.height = `${this.height}px`;
+
+
+        this.newX = 0;
+        this.newY = 0;
+
+        this.offsetX = 0;
+        this.offsetY = 0;
 
         return;
     }
@@ -323,6 +335,9 @@ class CustomWindow {
         if (newY > window.innerHeight - 70) newY = window.innerHeight - 70
         else if (newY < 0) newY = 0
 
+        this.newX = newX;
+        this.newY = newY;
+
         this.mainElement.style.left = `${newX}px`;
         this.mainElement.style.top = `${newY}px`;
         
@@ -330,10 +345,11 @@ class CustomWindow {
     }
 
     #stopMoveWindow = (e) => {
-        this.x += this.offsetX;
-        this.y += this.offsetY;
+        this.x = this.newX;
+        this.y = this.newY;
 
         this.#setCursorType('');
+        this.#updateTransform();
 
         document.onmousemove = null;
         document.onmouseup = null;
