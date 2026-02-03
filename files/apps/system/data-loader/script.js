@@ -2,6 +2,7 @@ function loadAppData(name) {
     let dataLoader = document.createElement('script');
     dataLoader.type = 'text/javascript';
     dataLoader.src = `./files/data/apps/${name}/data.js`;
+    
     document.body.appendChild(dataLoader);
 }
 

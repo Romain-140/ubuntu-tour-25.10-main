@@ -3,9 +3,14 @@ const maxWindowsNumber = 997;
 let takenWindowsID = [];
 let windowsList = [];
 
+let defaultData;
+
 class CustomWindow {
     #cursorTypeElement;
-    #draggableChildren = []
+    #draggableChildren = [];
+
+    #moved = false;
+
     mouseDownX = 0;
     mouseDownY = 0;
 
@@ -15,8 +20,14 @@ class CustomWindow {
     newX = 0;
     newY = 0;
 
-    constructor(appName, resizable = true, posX = 100, posY = 100, width = 400, height = 400, minWidth = 50, minHeight = 50) {
+    isContextMenuOpen = false;
+    contextMenu;
+
+    event;
+
+    constructor(appName, resizable = true, draggable = true, posX = 100, posY = 100, width = 400, height = 400, minWidth = 50, minHeight = 50) {
         this.name = appName;
+        this.appData = loadAppData(this.name);
 
         this.resize = resizable;
 
@@ -30,6 +41,7 @@ class CustomWindow {
         this.minHeight = minHeight;
 
         this.resizable = resizable;
+        this.draggable = draggable;
         this.fullscreen = false;
 
         this.id = this.#getLowestWindowID();
@@ -50,6 +62,8 @@ class CustomWindow {
         this.resizeElement = this.resizable ? this.#addResizeElement() : null;
 
         this.mainElement.addEventListener('mousedown', this.#clickHandeler);
+
+        defaultData = document.getElementById('window-manager_data');
 
         windowsList.push(this);
     }
@@ -78,7 +92,7 @@ class CustomWindow {
     #createWindowTopBar() {
         let topBarMenu = document.createElement('div');
 
-        topBarMenu.classList.add('window-test-topbar');
+        topBarMenu.classList.add('window-topbar');
         topBarMenu.classList.add('draggable');
 
         this.#draggableChildren.push(topBarMenu);
@@ -110,7 +124,7 @@ class CustomWindow {
     }
 
     #setCursorType(type) {
-        this.#cursorTypeElement.innerHTML = `*{cursor: ${type} !important}`;
+        this.#cursorTypeElement.innerHTML = `* {cursor: ${type} !important}`;
 
         return;
     }
@@ -119,7 +133,8 @@ class CustomWindow {
         this.#setToFirstPlan();
 
         if (e.buttons === 1) { // Left click
-            if (this.#draggableChildren.includes(e.target) && !this.fullscreen) {
+
+            if (this.#draggableChildren.includes(e.target) && !this.fullscreen && this.draggable) {
                 this.mouseDownX = e.x;
                 this.mouseDownY = e.y;
 
@@ -128,10 +143,70 @@ class CustomWindow {
                 document.onmousemove = this.#moveWindow;
                 document.onmouseup = this.#stopMoveWindow;
             }
+        } else if (e.buttons === 2) { // Right click
+
+            if (this.#draggableChildren.includes(e.target) && !this.isContextMenuOpen) {
+                this.#onpenContextMenu(e);
+            }
         }
     }
 
-    #resizeWindow(e, direction) {
+    #onpenContextMenu(event)  { // TODO: convert to class ContextMenu
+        let contextMenu = document.createElement('div');
+        contextMenu.id = `menu-${this.id}`;
+        contextMenu.classList.add('custom-menu');
+
+        let data = JSON.parse(defaultData.textContent);
+        let appData = null;
+        try {appData = JSON.parse(this.appData.textContent) || null;} catch {}
+
+        if (appData && appData.contextMenu[event.target.classList] !== undefined) { // App menu is defined
+            contextMenu.innerHTML = appData['contextMenu'][event.target.classList];
+            contextMenu.classList.add(`${this.name}-menu`);
+
+        }else if (data) { // Fallback: default
+            contextMenu.innerHTML = data['contextMenu'][event.target.classList];
+
+        }
+
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = `${event.x}px`;
+        contextMenu.style.top = `${event.y}px`;
+
+        this.event = event;
+
+        document.addEventListener('mousedown', this.#closeContextMenu);
+
+        this.isContextMenuOpen = true;
+        this.contextMenu = contextMenu;
+
+        document.body.appendChild(contextMenu);
+        
+        return;
+    }
+
+    #closeContextMenu = (e) => {
+        if (e === this.event) return;
+
+        document.removeEventListener('mousedown', this.#closeContextMenu);
+
+        this.isContextMenuOpen = false;
+
+        this.contextMenu.classList.add('disappear');
+
+        setTimeout(() => {
+            this.contextMenu.remove();
+            this.contextMenu = null;
+        }, 75);
+
+        return;
+    }
+
+    // TODO add actions
+
+    #resizeWindow(direction) {
+        if (!this.resizable) return;
+
         function resizeLeft(event) {
             this.offsetX = event.x - this.mouseDownX;
             let newWidth = this.width - this.offsetX;
@@ -294,7 +369,7 @@ class CustomWindow {
                 this.mouseDownX = e.x;
                 this.mouseDownY = e.y;
 
-                this.#resizeWindow(e, resizeDivs[id][1]);
+                this.#resizeWindow(resizeDivs[id][1]);
             });
 
             resizeParent.appendChild(resize);
@@ -340,22 +415,31 @@ class CustomWindow {
 
         this.mainElement.style.left = `${newX}px`;
         this.mainElement.style.top = `${newY}px`;
+
+        this.#moved = true;
         
         return;
     }
 
-    #stopMoveWindow = (e) => {
-        this.x = this.newX;
-        this.y = this.newY;
-
+    #stopMoveWindow = () => {
         this.#setCursorType('');
-        this.#updateTransform();
 
         document.onmousemove = null;
         document.onmouseup = null;
+
+        if (!this.#moved) return;
+
+        this.x = this.newX;
+        this.y = this.newY;
+
+        this.#updateTransform();
+
+        this.#moved = false;
         
         return;
     }
+
+    // Public functions
 
     addToDesktop() {
         let windowSpace = document.getElementById('window-space');
@@ -380,7 +464,7 @@ class CustomWindow {
         return;
     }
 
-    forceFullscreen(transition  = true, time = 0.15) {
+    forceFullscreen(transition  = true, time = 0.25) {
         this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
         this.fullscreen = true;
@@ -396,7 +480,7 @@ class CustomWindow {
         return;
     }
 
-    removeFullscreen(transition = true, time = 0.15) {
+    removeFullscreen(transition = true, time = 0.25) {
         this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
         this.fullscreen = false;
@@ -430,9 +514,12 @@ function loadStyle() {
 
 function onStart() {
     loadStyle();
+    loadAppData('window-manager');
 
     document.getElementById('option-2').addEventListener('click', () => {
         let windowTest = new CustomWindow('Test');
         windowTest.addToDesktop();
     });
 }
+
+// TODO check global context menu conditions close

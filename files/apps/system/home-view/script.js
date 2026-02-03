@@ -1,41 +1,262 @@
-function addOpenMenuEvent() {
-    const customMenu = document.getElementById('custom-menu');
+let customInputs = {
+    'range': {
+        'elements': [],
+        'objects': []
+    },
+    'checkbox': {
+        'elements': [],
+        'objects': []
+    },
+    'text': {
+        'elements': [],
+        'objects': []
+    }
+};
 
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
+let customMenus = {
+    'elements': [],
+    'objects': []
+};
 
-        if (e.target !== document.getElementById('selection') && e.target !== document.getElementById('window-space')) return;
+// // // Classes
 
-        customMenu.classList.remove('disappear');
-        customMenu.style.display = 'block';
+// // Inputs
 
-        var posY = e.clientY;
-        var posX = e.clientX;
+class CustomRangeInput {
+    offsetX = 0;
 
-        if (e.clientY + customMenu.clientHeight + 5 >= window.innerHeight) {
-            posY -= customMenu.clientHeight + 5;
+    #changeEvent = new CustomEvent('valuechange', {
+            details: {
+                value: this.value
+            }
         }
+    );
 
-        if (e.clientX + customMenu.clientWidth + 5 >= window.innerWidth) {
-            posX -= customMenu.clientWidth + 5;
-        }
+	constructor(element, value) {
+		this.value = value;
 
+		this.mainElement = element;
+		this.width = this.mainElement.getBoundingClientRect().width;
 
-        customMenu.style.left = `${posX/window.innerWidth * 100}%`;
-        customMenu.style.top = `${posY/window.innerHeight * 100}%`;
+		this.x = this.mainElement.getBoundingClientRect().x;
 
-        customMenu.style.display = 'block';
-    });
+        this.#setup();
+	}
+
+    #updateValue = () => {
+        this.mainElement.style.setProperty('--value', this.value);
+
+        return;
+    }
+
+	#setup = () => {
+		this.#updateValue();
+        
+        this.mainElement.firstChild.onmousedown = this.#focus;
+
+        return;
+	}
+
+    #focus = (e) => {
+        if (e.buttons !== 1) return;
+
+        document.addEventListener('mousemove', this.#moveCursor);
+        document.addEventListener('mouseup', this.#stopCursor);
+
+        return;
+    }
+
+    #moveCursor = (e) => {
+        if (e.x < this.x) this.offsetX = 0;
+        else if (e.x > this.x + this.width) this.offsetX = this.width;
+        else this.offsetX = e.x - this.x;
+
+        this.value = this.offsetX / this.width;
+        this.#updateValue();
+
+        this.#fireEvent();
+
+        return;
+    }
+
+    #stopCursor = () => {
+        document.removeEventListener('mousemove', this.#moveCursor);
+        document.removeEventListener('mouseup', this.#stopCursor);
+
+        return;
+    }
+
+    #fireEvent = () => {
+        this.mainElement.dispatchEvent(this.#changeEvent);
+
+        return;
+    }
 }
 
-function addCloseMenuEvent() {
-    const customMenu = document.getElementById('custom-menu');
-    document.addEventListener('mouseup', function(e) {
-        if (e.button !== 2) {
-            customMenu.classList.add('disappear');
-            setTimeout( () => {customMenu.style.display = 'none';}, 75)
+class CustomCheckboxInput {
+    #changeEvent = new CustomEvent('valuechange', {
+            details: {
+                value: this.value
+            }
         }
-    });
+    );
+
+    constructor(element, value, height = null, ratio = 1.75, animation = true) {
+        this.value = value;
+
+        this.ratio = ratio;
+        this.height = height || element.getBoundingClientRect().height;
+        this.mainElement = element;
+
+        this.animation = animation;
+
+        this.#setup();
+    }
+
+    #setup = () => {
+        this.#updateDisplay();
+
+        this.mainElement.style.transition = '';
+        setTimeout(this.#updateDisplay, 100);
+
+        this.mainElement.onmousedown = this.#changeValue;
+
+        return;
+    }
+
+    #updateDisplay = () => {
+        this.mainElement.style.height = this.height + 'px' || '';
+        this.mainElement.style.width = this.height * this.ratio + 'px' || '';
+        this.mainElement.style.transition = this.animation ? 'all .15s' : '';
+
+        this.mainElement.style.setProperty('--value', this.value);
+        this.mainElement.style.setProperty('--width', this.height - 10 + 'px');
+
+        return;
+    }
+
+    #changeValue = (e) => {
+        if (e.buttons !== 1) return;
+
+        this.value = this.value === 1 ? 0 : 1;
+        this.#updateDisplay();
+
+        this.mainElement.dispatchEvent(this.#changeEvent);
+
+        return;
+    }
+
+}
+
+// // Menus
+
+class CustomContextMenu {
+
+    #openEvent = new CustomEvent('contextmenuopen');
+    #closeEvent = new CustomEvent('contextmenuclosed');
+
+    constructor(element, targets, appName) {
+        this.mainElement = element;
+
+        this.targets = targets;
+        this.appName = appName;
+
+        this.x = 0;
+        this.y = 0;
+
+        this.width = element.getBoundingClientRect().width;
+        this.height = element.getBoundingClientRect().height;
+
+        this.hidden = false;
+
+        this.hide();
+
+        this.#setup();
+    }
+
+    #setup() {
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            console.log(e.target.classList);
+
+            if (!this.targets.includes(e.target.classList.value)) return;
+
+            this.#updatePosition(e);
+            this.show();
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (e.button === 2) return;
+
+            if (!this.hidden) {
+                this.hide();
+            }
+        })
+
+        return;
+    }
+
+    #updatePosition = (e) => {
+        this.x = e.x;
+        this.y = e.y;
+
+        if (this.x + this.width > window.innerWidth - 10) this.x = e.x - this.width;
+        if (this.y + this.height > window.innerHeight - 10) this.y = e.y - this.height;
+
+        this.mainElement.style.top = this.y + 'px';
+        this.mainElement.style.left = this.x + 'px';
+
+        return;
+    }
+
+    // Public Fuctions
+
+    changeDisplay = () => {
+        if (this.hidden) this.show();
+        else this.hide();
+
+        return;
+    }
+
+    hide = () => {
+        this.mainElement.classList.add('disappear');
+
+        setTimeout( () => {
+            this.mainElement.style.display = 'none';
+            this.hidden = true;
+
+            this.mainElement.dispatchEvent(this.#closeEvent);
+
+            this.mainElement.classList.remove('disappear');
+        }, 75);
+
+        return;
+    }
+
+    show = () => {
+        this.mainElement.style.display = 'block';
+        this.hidden = false;
+
+        this.mainElement.dispatchEvent(this.#openEvent);
+
+        return;
+    }
+}
+
+// // // Functions
+
+function addInput(element, type, value) {
+    if (!customInputs.getKeys().contains(type)) return;
+    if (customInputs[type].elements.contains(element)) return;
+
+    let input;
+
+    if (type === 'range') input = new CustomRangeInput(element, value);
+    else if (type === 'checkbox') input = new CustomCheckboxInput(element, value);
+
+    customInputs[type].elements.push(element);
+    customInputs[type].objects.push(input);
 }
 
 function addSelectionDivInteration() {
@@ -109,6 +330,11 @@ function createMenuDiv() {
     menu.id = "custom-menu";
     menu.classList.add("custom-menu");
     document.body.appendChild(menu);
+
+    let customMenu = new CustomContextMenu(menu, ['background'], 'main')
+
+    customMenus.elements.push(menu);
+    customMenus.objects.push(customMenu);
 }
 
 function createSelectionDiv() {
@@ -402,70 +628,12 @@ function initLocalSettings() {
     if (!localStorage.getItem('sound')) localStorage.setItem('sound', '0.3');
 }
 
-function addCustomInputEvents() {
-
-    initLocalSettings();
-
-    function checkRangeInputs() {
-
-        function setupElement(e) {
-
-            let element = e.target;
-
-            if (e.buttons === 2) return;
-
-            let width = e.target.parentElement.getBoundingClientRect().width;
-            let startX = e.target.parentElement.getBoundingClientRect().x;
-
-            function removeAllListeners() {
-                document.removeEventListener('mousemove', moveRange);
-                document.removeEventListener('mouseup', removeAllListeners);
-            }
-
-            function moveRange(e) {
-                let offsetX = e.clientX - startX;
-                if (offsetX / width > 1) offsetX = width
-                if (offsetX < 0) offsetX = 0
-                element.parentElement.style.setProperty('--value', `${offsetX / width}`);
-                element.parentElement.setAttribute('value', `${offsetX / width}`);
-                element.parentElement.dispatchEvent(new CustomEvent('valuechange', {
-                    detail: offsetX / width,
-                    bubbles: true,
-                    composed: true
-                }));
-            }
-
-            function focusRange() {
-                document.addEventListener('mousemove', moveRange);
-                document.addEventListener('mouseup', removeAllListeners);
-            }
-
-            focusRange()
-        }
-
-        let elements = document.querySelectorAll('.custom-input[type="range"]');
-
-        if (!elements) return;
-
-        for (let i = 0; i < elements.length; i++) {
-            let element = elements[i];
-            if (element.classList.value.includes('setup')) continue;
-
-            element.classList.add('setup');
-            element.firstChild.addEventListener('mousedown', setupElement);
-        }
-    }
-    
-
-    setInterval(checkRangeInputs, 100);
-}
-
 function addWindowSpace() {
     let windowSpace = document.createElement('div');
     windowSpace.id = 'window-space';
     windowSpace.classList.add('window-space');
     windowSpace.style.height = `${window.innerHeight - 31}px`;
-    setInterval(() => {windowSpace.style.height = `${window.innerHeight - 31}px`}, 100);
+    setInterval(() => {windowSpace.style.height = `${window.innerHeight - 31}px`}, 100); // TODO edit css
     document.body.append(windowSpace);  
 }
 
@@ -482,12 +650,12 @@ async function onStart() {
 
     await new Promise(r => setTimeout(r, 50));
 
+    addWindowSpace();
+
     // Home Menu
     createMenuDiv();
     createBackgroundDiv();
     createSelectionDiv();
-    addOpenMenuEvent();
-    addCloseMenuEvent();
 
     // To Bar
     createTopBarDiv();
@@ -497,14 +665,12 @@ async function onStart() {
     addStyle();
 
     // Windows
-    addWindowSpace();
     loadApp('notification-manager');
     loadApp('window-manager');
     loadApp('icon-loader');
 
     // Load after
     addSelectionDivInteration();
-    addCustomInputEvents();
 
     loadApp('browser-compatibility');
 
@@ -512,3 +678,5 @@ async function onStart() {
 }
 
 // Clean
+
+// TODO: add class for right click menu

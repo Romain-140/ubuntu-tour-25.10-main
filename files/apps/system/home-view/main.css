@@ -1,5 +1,6 @@
 :root {
     --value:                    0;
+    --width:                    0;
 }
 
                                 /* Fonts */
@@ -65,6 +66,8 @@ body  {
 
     height:                     0;
     width:                      100%;
+
+    top:                        -7px;
     
     cursor:                     pointer;
 }
@@ -119,6 +122,53 @@ body  {
     width:                      calc((1 - var(--value)) * 100%);
 
     background-color:         #5a5a5a;
+}
+
+                            /* Custom Checkbox */
+
+.custom-input[type="checkbox"] {
+    position:                   relative;
+    height:                     100%;
+    width:                      100%;
+}
+
+.custom-input[type="checkbox"]::before,
+.custom-input[type="checkbox"]::after {
+    position:                   absolute;
+    top:                        0;
+    left:                       0;
+    display:                    block;
+    cursor:                     pointer;
+    content:                    '';
+
+    border-radius:              50vh;
+
+    transition:                 inherit;
+}
+
+.custom-input[type="checkbox"]::before {
+    z-index:                    0;
+
+    height:                     100%;
+    width:                      100%;
+
+    background-color: rgb(
+        calc(235 * var(--value) + 90 * (1 - var(--value))),
+        calc(66  * var(--value) + 90 * (1 - var(--value))),
+        calc(0   * var(--value) + 90 * (1 - var(--value)))
+    );
+}
+
+.custom-input[type="checkbox"]::after {
+    z-index:                    1;
+
+    top:                        2px;
+    left:                       calc(2px * (1 - var(--value)) + (100% - 8px - var(--width)) * var(--value));
+
+    height:                     calc(100% - 4px);
+    aspect-ratio:               1 / 1;
+
+    background-color:        #dedede;
 }
 
 .menu-range {

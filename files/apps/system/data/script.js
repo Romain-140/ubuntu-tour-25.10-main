@@ -1,6 +1,4 @@
 let data = {
-    "window template": "<div id='window-start' class='window' style='position: absolute; top: 20%; left: 20%; z-index: 1' minx='100' miny='100'><div class='window-test-topbar draggable'></div></div>",
-    "window-test-topbar draggable": "<ul><li><a id='window-fullscreen'>Fullscreen</a></li><li><a id='window-close'>Close Window</a></li></ul>",
     "main-menu": "<ul><li><a id='option-1'>Notification Test</a></li><li><a id='option-2'>Window Test</a></li><li><a>Custom Option 3</a></li><hr><li><a>Option 4</a></li></ul>",
     "connection-icons": {
         "low": '<img src="./files/icons/sys/Yaru/connection_low.svg" height="20px" width="20px"></img>',
