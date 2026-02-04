@@ -152,7 +152,6 @@ class CustomCheckboxInput {
 
 class CustomContextMenu {
 
-    #openEvent = new CustomEvent('contextmenuopen');
     #closeEvent = new CustomEvent('contextmenuclosed');
 
     constructor(element, targets, appName) {
@@ -178,12 +177,10 @@ class CustomContextMenu {
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
 
-            console.log(e.target.classList);
-
-            if (!this.targets.includes(e.target.classList.value)) return;
+            if (this.targets && !this.targets.includes(e.target.classList.value)) return;
 
             this.#updatePosition(e);
-            this.show();
+            this.show(e);
         });
 
         document.addEventListener('mouseup', (e) => {
@@ -192,7 +189,7 @@ class CustomContextMenu {
             if (!this.hidden) {
                 this.hide();
             }
-        })
+        });
 
         return;
     }
@@ -234,11 +231,22 @@ class CustomContextMenu {
         return;
     }
 
-    show = () => {
+    show = (e) => {
         this.mainElement.style.display = 'block';
         this.hidden = false;
 
-        this.mainElement.dispatchEvent(this.#openEvent);
+        this.mainElement.dispatchEvent(new CustomEvent('contextmenuopen', {
+            detail:  {
+                target: e.target
+            }
+        }));
+
+        return;
+    }
+
+    forceHide = () => {
+        this.mainElement.style.display = 'none';
+        this.hide();
 
         return;
     }

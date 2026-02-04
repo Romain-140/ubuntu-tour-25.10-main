@@ -3,8 +3,6 @@ const maxWindowsNumber = 997;
 let takenWindowsID = [];
 let windowsList = [];
 
-let defaultData;
-
 class CustomWindow {
     #cursorTypeElement;
     #draggableChildren = [];
@@ -24,6 +22,8 @@ class CustomWindow {
     contextMenu;
 
     event;
+
+    defaultData;
 
     constructor(appName, resizable = true, draggable = true, posX = 100, posY = 100, width = 400, height = 400, minWidth = 50, minHeight = 50) {
         this.name = appName;
@@ -55,15 +55,17 @@ class CustomWindow {
             }
         )
 
+        this.defaultData = document.getElementById('window-manager_data');
+
         this.#initCursorType();
 
         this.#setToFirstPlan();
         this.#createWindowTopBar();
         this.resizeElement = this.resizable ? this.#addResizeElement() : null;
 
-        this.mainElement.addEventListener('mousedown', this.#clickHandeler);
+        this.#addContextMenu();
 
-        defaultData = document.getElementById('window-manager_data');
+        this.mainElement.addEventListener('mousedown', this.#clickHandeler);
 
         windowsList.push(this);
     }
@@ -134,7 +136,7 @@ class CustomWindow {
 
         if (e.buttons === 1) { // Left click
 
-            if (this.#draggableChildren.includes(e.target) && !this.fullscreen && this.draggable) {
+            if (this.#draggableChildren.includes(e.target) && !this.fullscreen && this.draggable) { // Drag
                 this.mouseDownX = e.x;
                 this.mouseDownY = e.y;
 
@@ -145,29 +147,10 @@ class CustomWindow {
             }
         } else if (e.buttons === 2) { // Right click
 
-            if (this.#draggableChildren.includes(e.target) && !this.isContextMenuOpen) {
-                this.#onpenContextMenu(e);
-            }
         }
     }
 
-    #onpenContextMenu(event)  { // TODO: convert to class ContextMenu
-        let contextMenu = document.createElement('div');
-        contextMenu.id = `menu-${this.id}`;
-        contextMenu.classList.add('custom-menu');
-
-        let data = JSON.parse(defaultData.textContent);
-        let appData = null;
-        try {appData = JSON.parse(this.appData.textContent) || null;} catch {}
-
-        if (appData && appData.contextMenu[event.target.classList] !== undefined) { // App menu is defined
-            contextMenu.innerHTML = appData['contextMenu'][event.target.classList];
-            contextMenu.classList.add(`${this.name}-menu`);
-
-        }else if (data) { // Fallback: default
-            contextMenu.innerHTML = data['contextMenu'][event.target.classList];
-
-        }
+    #onpenContextMenu(event)  {
 
         contextMenu.style.display = 'block';
         contextMenu.style.left = `${event.x}px`;
@@ -178,10 +161,46 @@ class CustomWindow {
         document.addEventListener('mousedown', this.#closeContextMenu);
 
         this.isContextMenuOpen = true;
-        this.contextMenu = contextMenu;
+        
+        return;
+    }
+
+    #updateMenuData = (e) => {
+        let data = JSON.parse(this.defaultData.textContent);
+        let appData = null;
+        try {appData = JSON.parse(this.appData.textContent) || null;} catch {}
+
+        if (appData && appData.contextMenu[e.detail.target.classList] !== undefined) { // App menu is defined
+            this.contextMenu.mainElement.innerHTML = appData['contextMenu'][e.detail.target.classList];
+            this.contextMenu.mainElement.classList.add(`${this.name}-menu`);
+
+        } else if (data && data['contextMenu'][e.detail.target.classList] !== undefined) { // Fallback: default
+            this.contextMenu.mainElement.innerHTML = data['contextMenu'][e.detail.target.classList];
+
+        } else { // Give up
+            this.contextMenu.mainElement.innerHTML = '';
+            this.contextMenu.forceHide();
+
+        }
+
+        return;
+    }
+
+    #addContextMenu() {
+        let contextMenu = document.createElement('div');
+        contextMenu.id = `menu-${this.id}`;
+        contextMenu.classList.add('custom-menu');
+
+        let menuObject = new CustomContextMenu(contextMenu, null, this.appName); // TODO add hasParent (element) to contextMenu class
+        this.contextMenu = menuObject;
+
+        contextMenu.addEventListener('contextmenuopen', this.#updateMenuData)
+
+        customMenus.elements.push(contextMenu);
+        customMenus.objects.push(menuObject);
 
         document.body.appendChild(contextMenu);
-        
+
         return;
     }
 
@@ -522,4 +541,4 @@ function onStart() {
     });
 }
 
-// TODO check global context menu conditions close
+// TODO edit top bar right range + wifi / battery (on change property) + light / sound (on value change event custom)
