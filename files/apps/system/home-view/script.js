@@ -25,13 +25,6 @@ let customMenus = {
 class CustomRangeInput {
     offsetX = 0;
 
-    #changeEvent = new CustomEvent('valuechange', {
-            details: {
-                value: this.value
-            }
-        }
-    );
-
 	constructor(element, value) {
 		this.value = value;
 
@@ -52,13 +45,15 @@ class CustomRangeInput {
 	#setup = () => {
 		this.#updateValue();
         
-        this.mainElement.firstChild.onmousedown = this.#focus;
+        this.mainElement.onmousedown = this.#focus;
 
         return;
 	}
 
     #focus = (e) => {
         if (e.buttons !== 1) return;
+
+        this.#moveCursor(e);
 
         document.addEventListener('mousemove', this.#moveCursor);
         document.addEventListener('mouseup', this.#stopCursor);
@@ -87,7 +82,13 @@ class CustomRangeInput {
     }
 
     #fireEvent = () => {
-        this.mainElement.dispatchEvent(this.#changeEvent);
+        let val = this.value;
+        let event = new CustomEvent('valuechange', {
+            detail: {
+                value: val
+            }
+        });
+        this.mainElement.dispatchEvent(event);
 
         return;
     }
@@ -255,8 +256,8 @@ class CustomContextMenu {
 // // // Functions
 
 function addInput(element, type, value) {
-    if (!customInputs.getKeys().contains(type)) return;
-    if (customInputs[type].elements.contains(element)) return;
+    if (!Object.keys(customInputs).includes(type)) return;
+    if (customInputs[type].elements.includes(element)) return;
 
     let input;
 
@@ -272,11 +273,11 @@ function addSelectionDivInteration() {
     const selectionDiv = document.getElementById('selection');
     let startX, startY;
 
-    let windowSpace = document.getElementById('window-space');
+    let background = document.getElementById('background');
 
-    windowSpace.addEventListener('mousedown', function(e) {
+    background.addEventListener('mousedown', function(e) {
 
-        if (e.target !== windowSpace || e.button === 2) return;
+        if (e.target !== background || e.button === 2) return;
 
         startX = e.clientX;
         startY = e.clientY;
@@ -380,7 +381,7 @@ function createTopBarDiv() {
 
 function updateTime() {
     const now = new Date();
-    const formatter = new Intl.DateTimeFormat('en-US', {month: 'short',day: 'numeric',hour: '2-digit',minute: '2-digit',hour12: false});
+    const formatter = new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false});
     const formatted = formatter.format(now);
     const final = formatted.replace(',', '');
     return final;
@@ -398,64 +399,86 @@ function addTimeDiv() {
     element.appendChild(timeDiv);
 }
 
-function addUpdateElementsTopRight() {
+async function addUpdateElementsTopRight() {
 
     let JSONData = document.getElementById('json-data');
 
+    await new Promise(r => setTimeout(r, 100));
+
     // Network
 
+    async function updateConnectionIcon() {
+        let connectionType = navigator.connection.effectiveType;
+        let quality = "low";
+
+        let icons = JSON.parse(JSONData.innerHTML)["connection-icons"]
+
+        if (connectionType === '4g') {
+            quality = "high";
+        } else if (connectionType === '3g') {
+            quality = "medium";
+        } else if (connectionType === '2g') {
+            quality = "low";
+        }
+
+        let networkElement = document.getElementById('network');
+
+        networkElement.innerHTML = icons[quality];
+
+        return;
+    }
+
     if (localStorage.getItem('networkUpdate')) {
-        setInterval(() => {
-            let connectionType = navigator.connection.effectiveType;
-            let quality = "low";
 
-            let icons = JSON.parse(JSONData.innerHTML)["connection-icons"]
+        navigator.connection.onchange = () => {dispatchEvent(new CustomEvent('networkupdate'))};
 
-            if (connectionType === '4g') {
-                quality = "high";
-            } else if (connectionType === '3g') {
-                quality = "medium";
-            } else if (connectionType === '2g') {
-                quality = "low";
-            }
+        document.addEventListener('networkupdate', updateConnectionIcon);
 
-            let networkElement = document.getElementById('network');
-            networkElement.innerHTML = icons[quality];
-        }, 3000);
+        updateConnectionIcon();
     }
 
     // Battery
 
+    function updateBatteryIcon(batteryData) {
+        let icons = JSON.parse(JSONData.innerHTML)["battery-icons"];
+
+        let status;
+
+        if (batteryData.charging)  {
+            status = 'charging';
+        } else {
+            status = 'discharging';
+        }
+
+        let quality;
+
+        if (batteryData.level < 0.1) {
+            quality = "empty";
+        } else if (batteryData.level < 0.3) {
+            quality = "low";
+        } else if (batteryData.level < 0.5) {
+            quality = "medium";
+        } else if (batteryData.level < 0.8) {
+            quality = "high";
+        } else {
+            quality = "full";
+        }
+
+        let batteryElement = document.querySelector('#battery');
+        batteryElement.innerHTML = icons[status][quality];
+
+        return;
+    }
+
     if (localStorage.getItem('batteryUpdate')) {
-        setInterval(async function () {
-            let batteryData = await navigator.getBattery();
-            let icons = JSON.parse(JSONData.innerHTML)["battery-icons"];
 
-            let status;
+        let battery = await navigator.getBattery();
+        battery.onlevelchange = () => {dispatchEvent(new CustomEvent('batteryupdate', {details: {battery: battery}}))};
+        battery.onchargingchange = () => {dispatchEvent(new CustomEvent('batteryupdate', {details: {battery: battery}}))};
 
-            if (batteryData.charging)  {
-                status = 'charging';
-            } else {
-                status = 'discharging';
-            }
+        document.addEventListener('batteryupdate', updateBatteryIcon);
 
-            let quality;
-
-            if (batteryData.level < 0.1) {
-                quality = "empty";
-            } else if (batteryData.level < 0.3) {
-                quality = "low";
-            } else if (batteryData.level < 0.5) {
-                quality = "medium";
-            } else if (batteryData.level < 0.8) {
-                quality = "high";
-            } else {
-                quality = "full";
-            }
-
-            let batteryElement = document.querySelector('#battery');
-            batteryElement.innerHTML = icons[status][quality];
-        }, 3000)
+        updateBatteryIcon(battery);
     }
 }
 
@@ -547,8 +570,9 @@ function addTopBarMenues() {
 
     let rightDiv = document.getElementsByClassName('top-bar-right')[0];
 
-    function addTopRightMenu(e) {
-        e.stopPropagation()
+    async function addTopRightMenu() {
+
+        await new Promise(r => setTimeout(r, 50));
 
         function removeMenu(event) {
             let menuDiv = document.getElementsByClassName('top-right-menu')[0];
@@ -583,22 +607,29 @@ function addTopBarMenues() {
             let menuDiv = document.createElement('div');
             menuDiv.classList.add('top-right-menu');
             menuDiv.classList.add('menu');
-            menuDiv.innerHTML = JSON.parse(JSONData.innerHTML)[menuDiv.classList.value];
+            menuDiv.innerHTML = JSON.parse(JSONData.innerHTML)[menuDiv.classList.value]; // load template from data (HTML)
             document.body.appendChild(menuDiv);
 
-            document.getElementById('brightness-selection')
-                .addEventListener('valuechange', function (e) {
-                    localStorage.brightness = e.detail;
-                    document.querySelector('.load-screen').style.setProperty('--opacity', (1 - e.detail) / 1.2);
-                    document.querySelector('.load-screen').style.opacity = 1;
-                }
-            );
+            let brightnessSelection = document.getElementById('brightness-selection');
 
-            document.getElementById('sound-selection')
-                .addEventListener('valuechange', function (e) {
+            brightnessSelection.addEventListener('valuechange', function (e) {
+                localStorage.brightness = e.detail.value;
+                document.querySelector('.load-screen').style.setProperty('--opacity', (1 - e.detail.value) / 1.2);
+                document.querySelector('.load-screen').style.opacity = 1;
+            });
+
+            localStorage.brightness = 1;
+            localStorage.sound = 0.3;
+
+            addInput(brightnessSelection, 'range', localStorage.brightness);
+
+            let soundSelection = document.getElementById('sound-selection');
+
+            soundSelection.addEventListener('valuechange', function (e) {
                     localStorage.sound = e.detail;
-                }
-            );
+            });
+
+            addInput(soundSelection, 'range', localStorage.sound);
 
             document.getElementById('menu-night-light')
                 .addEventListener('click', changeNightLight);
@@ -686,5 +717,3 @@ async function onStart() {
 }
 
 // Clean
-
-// TODO: add class for right click menu

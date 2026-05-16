@@ -67,12 +67,13 @@ body  {
     height:                     0;
     width:                      100%;
 
-    top:                        -7px;
+    top:                        15px;
     
     cursor:                     pointer;
 }
 
-.custom-input[type="range"] .selector {
+.custom-input[type="range"]::after {
+    content: "";
     z-index:                    2;
 
     display:                    block;
@@ -91,7 +92,7 @@ body  {
     transition:                 background-color .05s;
 }
 
-.custom-input[type="range"] .selector:hover {
+.custom-input[type="range"]::after:hover {
     background-color:           #fff;
 }
 
@@ -104,24 +105,10 @@ body  {
     border-radius:              5px;
 
     height:                     4px;
-    width:                      calc(var(--value) * 100%);
+    width:                      100%;
 
-    background-color:         rgb(235, 66, 0);
-}
+    background:                 linear-gradient(90deg, rgb(235, 66, 0) calc(var(--value) * 100%), #5A5A5A 0%);
 
-.custom-input[type="range"]::after {
-    content:                    "";
-
-    position:                   absolute;
-    left:                       calc(var(--value) * 100%);
-    display:                    block;
-
-    border-radius:              5px;
-
-    height:                     4px;
-    width:                      calc((1 - var(--value)) * 100%);
-
-    background-color:         #5a5a5a;
 }
 
                             /* Custom Checkbox */

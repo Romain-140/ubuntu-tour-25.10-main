@@ -541,4 +541,9 @@ function onStart() {
     });
 }
 
-// TODO edit top bar right range + wifi / battery (on change property) + light / sound (on value change event custom)
+// TODO edit top bar right range + wifi / battery (on change property) + light / sound (on value change event custom) (WIP : 1/2)
+// TODO fix top right menu updates (battery, sound, brightness) + setup new ranges
+// TODO make notifications classes
+// TODO add more options to windows menu + make them work
+
+// TODO fire event on info change (WIP)
