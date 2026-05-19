@@ -175,10 +175,15 @@ class CustomContextMenu {
     }
 
     #setup() {
-        document.addEventListener('contextmenu', (e) => {
+        document.addEventListener('contextmenu', (e) => { // selects target + all children
             e.preventDefault();
 
-            if (this.targets && !this.targets.includes(e.target.classList.value)) return;
+            let all_targets = this.targets;
+            for (let target of this.targets) {
+                all_targets = all_targets.concat(Array.from(target.querySelectorAll('*')));
+            }
+
+            if (this.targets && !(all_targets.includes(e.target))) return;
 
             this.#updatePosition(e);
             this.show(e);
@@ -210,6 +215,14 @@ class CustomContextMenu {
 
     // Public Fuctions
 
+    deleteMenu = () => {
+        this.mainElement.remove();
+
+        delete this;
+
+        return;
+    }
+
     changeDisplay = () => {
         if (this.hidden) this.show();
         else this.hide();
@@ -238,7 +251,7 @@ class CustomContextMenu {
 
         this.mainElement.dispatchEvent(new CustomEvent('contextmenuopen', {
             detail:  {
-                target: e.target
+                target: e.target,
             }
         }));
 
@@ -340,7 +353,7 @@ function createMenuDiv() {
     menu.classList.add("custom-menu");
     document.body.appendChild(menu);
 
-    let customMenu = new CustomContextMenu(menu, ['background'], 'main')
+    let customMenu = new CustomContextMenu(menu, [document.getElementById('background')], 'main')
 
     customMenus.elements.push(menu);
     customMenus.objects.push(customMenu);
@@ -692,8 +705,8 @@ async function onStart() {
     addWindowSpace();
 
     // Home Menu
-    createMenuDiv();
     createBackgroundDiv();
+    createMenuDiv();
     createSelectionDiv();
 
     // To Bar

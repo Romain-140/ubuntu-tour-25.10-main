@@ -9,6 +9,8 @@ class CustomWindow {
 
     #moved = false;
 
+    #customMenuSet = false;
+
     mouseDownX = 0;
     mouseDownY = 0;
 
@@ -74,6 +76,7 @@ class CustomWindow {
         let i = 0;
 
         while (takenWindowsID.includes(i)) i++
+        takenWindowsID.push(i);
 
         return i;
     }
@@ -150,7 +153,7 @@ class CustomWindow {
         }
     }
 
-    #onpenContextMenu(event)  {
+    #onpenContextMenu(event) {
 
         contextMenu.style.display = 'block';
         contextMenu.style.left = `${event.x}px`;
@@ -166,9 +169,23 @@ class CustomWindow {
     }
 
     #updateMenuData = (e) => {
+
+        let addMenuLoader = (menuElement) => {
+            let dataLoader = document.createElement('script');
+            dataLoader.type = 'text/javascript';
+            dataLoader.src = `./files/data/apps/${this.name}/custom-menu.js`;
+    
+            document.body.appendChild(dataLoader);
+
+            dataLoader.onload = () => {loadMenuActions(menuElement, this)};
+
+            return;
+        }
+
         let data = JSON.parse(this.defaultData.textContent);
-        let appData = null;
-        try {appData = JSON.parse(this.appData.textContent) || null;} catch {}
+        let appData = document.getElementById(`${this.name}_data`);
+        
+        try {appData = JSON.parse(appData.textContent) || null;} catch {}
 
         if (appData && appData.contextMenu[e.detail.target.classList] !== undefined) { // App menu is defined
             this.contextMenu.mainElement.innerHTML = appData['contextMenu'][e.detail.target.classList];
@@ -183,15 +200,21 @@ class CustomWindow {
 
         }
 
+        if (!this.#customMenuSet) {
+            addMenuLoader(this.contextMenu.mainElement);
+            this.#customMenuSet = true;
+        }
+
         return;
     }
 
     #addContextMenu() {
+
         let contextMenu = document.createElement('div');
         contextMenu.id = `menu-${this.id}`;
         contextMenu.classList.add('custom-menu');
 
-        let menuObject = new CustomContextMenu(contextMenu, null, this.appName); // TODO add hasParent (element) to contextMenu class
+        let menuObject = new CustomContextMenu(contextMenu, [this.mainElement], this.appName); // TODO : add function to each buton (in data.js???)
         this.contextMenu = menuObject;
 
         contextMenu.addEventListener('contextmenuopen', this.#updateMenuData)
@@ -217,6 +240,12 @@ class CustomWindow {
             this.contextMenu.remove();
             this.contextMenu = null;
         }, 75);
+
+        return;
+    }
+
+    #removeContextMenu() {
+        this.contextMenu.deleteMenu();
 
         return;
     }
@@ -484,6 +513,11 @@ class CustomWindow {
     }
 
     forceFullscreen(transition  = true, time = 0.25) {
+        if (this.fullscreen) {
+            this.removeFullscreen(transition, time);
+            return;
+        }
+
         this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
         this.fullscreen = true;
@@ -500,6 +534,11 @@ class CustomWindow {
     }
 
     removeFullscreen(transition = true, time = 0.25) {
+        if (!this.fullscreen) {
+            this.forceFullscreen(transition, time);
+            return;
+        }
+        
         this.mainElement.style.transition = transition ? `all ${time}s` : '';
 
         this.fullscreen = false;
@@ -516,9 +555,19 @@ class CustomWindow {
         if (!silent) this.mainElement.dispatchEvent(this.closeEvent);
         this.mainElement.classList.add('remove');
 
-        windowsList.remove(this);
+        windowsList.splice(
+            windowsList.indexOf(this),
+            1
+        );
+
+        takenWindowsID.splice(
+            takenWindowsID.indexOf(this.id),
+            1
+        );
 
         setTimeout(() => {this.mainElement.remove()}, 100);
+
+        delete this;
 
         return;
     }
